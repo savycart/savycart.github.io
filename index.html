@@ -60,37 +60,51 @@ body {font-family: Arial; margin:0; background:#f5f5f5;}
 
 <body>
 
-<!-- LOGO -->
+<!-- LOGO (NO LINK NOW) -->
 <div class="header">
-  <a href="https://youtube.com" target="_blank">
-    <img src="logo.png" class="logo">
-  </a>
+  <img src="logo.png" class="logo">
 </div>
 
 <!-- SEARCH -->
 <div class="search">
-  <input placeholder="Search...">
-  <button>🔍</button>
+  <input id="searchInput" placeholder="Search..." onkeyup="searchProducts()">
 </div>
 
 <!-- PRODUCTS -->
-<div class="products">
+<div class="products" id="productList">
 
   <div class="card">
-    <a href="https://youtube.com" target="_blank">
+    <a href="YOUR-LINK-HERE" target="_blank">
       <img src="https://via.placeholder.com/150">
-      <h4>Product 1</h4>
+      <h4 class="title">Item One</h4>
     </a>
   </div>
 
   <div class="card">
-    <a href="https://youtube.com" target="_blank">
+    <a href="YOUR-LINK-HERE" target="_blank">
       <img src="https://via.placeholder.com/150">
-      <h4>Product 2</h4>
+      <h4 class="title">Item Two</h4>
     </a>
   </div>
 
 </div>
+
+<script>
+function searchProducts() {
+  let input = document.getElementById("searchInput").value.toLowerCase();
+  let cards = document.getElementsByClassName("card");
+
+  for (let i = 0; i < cards.length; i++) {
+    let title = cards[i].innerText.toLowerCase();
+
+    if (title.includes(input)) {
+      cards[i].style.display = "block";
+    } else {
+      cards[i].style.display = "none";
+    }
+  }
+}
+</script>
 
 </body>
 </html>
