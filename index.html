@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Savy Cart</title>
+
+<style>
+body {font-family: Arial; margin:0; background:#f5f5f5;}
+
+/* LOGO */
+.header {
+  text-align:center;
+  padding:20px;
+}
+
+.logo {
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid gold;
+}
+
+/* SEARCH */
+.search {
+  display:flex;
+  justify-content:center;
+  margin:10px;
+}
+
+.search input {
+  width:60%;
+  padding:10px;
+}
+
+.search button {
+  padding:10px;
+}
+
+/* PRODUCTS */
+.products {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  padding:10px;
+}
+
+.card {
+  background:white;
+  padding:10px;
+  text-align:center;
+  border-radius:10px;
+}
+
+.card img {
+  width:100%;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGO -->
+<div class="header">
+  <a href="https://youtube.com" target="_blank">
+    <img src="logo.png" class="logo">
+  </a>
+</div>
+
+<!-- SEARCH -->
+<div class="search">
+  <input placeholder="Search...">
+  <button>🔍</button>
+</div>
+
+<!-- PRODUCTS -->
+<div class="products">
+
+  <div class="card">
+    <a href="https://youtube.com" target="_blank">
+      <img src="https://via.placeholder.com/150">
+      <h4>Product 1</h4>
+    </a>
+  </div>
+
+  <div class="card">
+    <a href="https://youtube.com" target="_blank">
+      <img src="https://via.placeholder.com/150">
+      <h4>Product 2</h4>
+    </a>
+  </div>
+
+</div>
+
+</body>
+</html>
