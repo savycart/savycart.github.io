@@ -88,18 +88,18 @@ body {
   font-weight:bold;
 }
 
-/* PRODUCTS GRID */
+/* PRODUCTS GRID (4 COLUMNS) */
 .products {
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-  padding:12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 12px;
 }
 
 /* CARD */
 .card {
   background:white;
-  padding:12px;
+  padding:10px;
   text-align:center;
   border-radius:14px;
   transition:0.2s;
@@ -110,18 +110,18 @@ body {
   transform:scale(1.04);
 }
 
-/* IMAGE FIX (IMPORTANT) */
+/* IMAGE NORMAL SIZE */
 .card img {
-  width: 100%;
-  max-width: 160px;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 12px;
-  display: block;
-  margin: 0 auto;
+  width:100%;
+  max-width:140px;
+  height:140px;
+  object-fit:cover;
+  border-radius:12px;
+  display:block;
+  margin:0 auto;
 }
 
-/* REMOVE UNDERLINE FROM LINKS */
+/* REMOVE UNDERLINE */
 .card a {
   text-decoration:none;
   color:inherit;
@@ -132,6 +132,22 @@ body {
   margin:8px 0 0;
   font-size:13px;
   color:#333;
+}
+
+/* MOBILE RESPONSIVE (still 4 columns) */
+@media (max-width: 600px) {
+  .products {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .card img {
+    height: 90px;
+  }
+
+  .card h4 {
+    font-size: 11px;
+  }
 }
 </style>
 </head>
@@ -164,7 +180,7 @@ body {
   <div class="card">
     <a href="https://www.youtube.com/@SAVYCART232" target="_blank">
       <img src="logo.png">
-      <h4>Savy Cart YouTube Channel</h4>
+      <h4>YouTube</h4>
     </a>
   </div>
 
@@ -172,7 +188,23 @@ body {
   <div class="card">
     <a href="#">
       <img src="https://via.placeholder.com/150">
-      <h4>New Product</h4>
+      <h4>Product 2</h4>
+    </a>
+  </div>
+
+  <!-- PRODUCT 3 -->
+  <div class="card">
+    <a href="#">
+      <img src="https://via.placeholder.com/150">
+      <h4>Product 3</h4>
+    </a>
+  </div>
+
+  <!-- PRODUCT 4 -->
+  <div class="card">
+    <a href="#">
+      <img src="https://via.placeholder.com/150">
+      <h4>Product 4</h4>
     </a>
   </div>
 
