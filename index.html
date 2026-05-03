@@ -88,10 +88,10 @@ body {
   font-weight:bold;
 }
 
-/* PRODUCTS GRID (4 COLUMNS) */
+/* PRODUCTS GRID */
 .products {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr); /* PC */
   gap: 10px;
   padding: 12px;
 }
@@ -110,11 +110,11 @@ body {
   transform:scale(1.04);
 }
 
-/* IMAGE NORMAL SIZE */
+/* IMAGE */
 .card img {
   width:100%;
-  max-width:140px;
-  height:140px;
+  max-width:150px;
+  height:150px;
   object-fit:cover;
   border-radius:12px;
   display:block;
@@ -134,19 +134,19 @@ body {
   color:#333;
 }
 
-/* MOBILE RESPONSIVE (still 4 columns) */
+/* 📱 MOBILE = 2 COLUMNS */
 @media (max-width: 600px) {
   .products {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   .card img {
-    height: 90px;
+    height: 110px;
   }
 
   .card h4 {
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 </style>
@@ -176,15 +176,20 @@ body {
 <!-- PRODUCTS -->
 <div class="products">
 
-  <!-- PRODUCT 1 -->
   <div class="card">
     <a href="https://www.youtube.com/@SAVYCART232" target="_blank">
       <img src="logo.png">
-      <h4>YouTube</h4>
+      <h4>YouTube Channel</h4>
     </a>
   </div>
 
-  <!-- PRODUCT 2 -->
+  <div class="card">
+    <a href="#">
+      <img src="https://via.placeholder.com/150">
+      <h4>Product 1</h4>
+    </a>
+  </div>
+
   <div class="card">
     <a href="#">
       <img src="https://via.placeholder.com/150">
@@ -192,19 +197,10 @@ body {
     </a>
   </div>
 
-  <!-- PRODUCT 3 -->
   <div class="card">
     <a href="#">
       <img src="https://via.placeholder.com/150">
       <h4>Product 3</h4>
-    </a>
-  </div>
-
-  <!-- PRODUCT 4 -->
-  <div class="card">
-    <a href="#">
-      <img src="https://via.placeholder.com/150">
-      <h4>Product 4</h4>
     </a>
   </div>
 
