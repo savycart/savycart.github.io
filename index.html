@@ -4,22 +4,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Savy Cart</title>
 
-<!-- Google Fonts for Premium Typography -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
 
-<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JCCN0D4FF4"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-JCCN0D4FF4');
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JCCN0D4FF4');
 </script>
 
 <style>
-/* 1. UPDATED BACKGROUND TO MATCH LOGO THEME */
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
@@ -34,16 +31,17 @@ body {
   padding: 40px 15px 10px;
 }
 
+/* ✅ LOGO WITH SMALL GLOW */
 .logo {
   width: 130px;
   height: 130px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #D4AF37; /* Gold border from logo.png.jpg */
+  border: 3px solid #D4AF37;
   box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.6)); /* small glow added */
 }
 
-/* --- AUTOMATIC COLOR CHANGING ANIMATION --- */
 @keyframes goldPulse {
   0% {
     background: linear-gradient(to bottom, #f9e195 0%, #d4af37 100%);
@@ -65,16 +63,13 @@ body {
   }
 }
 
-/* 2. SAVY CART TEXT: FONT & COLOR CHANGING EFFECT */
 .title {
   font-family: 'Playfair Display', serif;
   font-size: 36px;
   font-weight: bold;
   margin-top: 15px;
   letter-spacing: 1px;
-  
   display: inline-block;
-  /* Animation added here */
   animation: goldPulse 3s infinite ease-in-out;
 }
 
@@ -89,7 +84,7 @@ body {
   width: 85%;
   max-width: 420px;
   display: flex;
-  background: rgba(255, 255, 255, 0.05); /* Semi-transparent dark look */
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(212, 175, 55, 0.4);
   border-radius: 30px;
   overflow: hidden;
@@ -109,7 +104,7 @@ body {
 .search-box span {
   padding: 14px 20px;
   cursor: pointer;
-  background: #D4AF37; /* Gold theme */
+  background: #D4AF37;
   color: #061226;
   font-weight: bold;
 }
@@ -140,9 +135,10 @@ body {
   border-color: #D4AF37;
 }
 
+/* ✅ FIXED IMAGE (no overflow) */
 .card img {
-  width: 150%;
-  max-width:250px;
+  width: 100%;
+  max-width: 250px;
   height: 150px;
   object-fit: cover;
   border-radius: 12px;
@@ -162,7 +158,7 @@ body {
   font-weight: 400;
 }
 
-/* MOBILE = 2 COLUMNS */
+/* MOBILE */
 @media (max-width: 600px) {
   .products {
     grid-template-columns: repeat(2, 1fr);
@@ -177,14 +173,12 @@ body {
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <img src="logo.png" class="logo">
   <br>
   <div class="title">SAVY CART</div>
 </div>
 
-<!-- SEARCH -->
 <div class="search">
   <div class="search-box">
     <input type="text" id="searchInput" placeholder="Search premium products..." onkeyup="searchProducts()">
@@ -192,7 +186,6 @@ body {
   </div>
 </div>
 
-<!-- PRODUCTS -->
 <div class="products">
 
   <div class="card">
