@@ -4,6 +4,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Savy Cart</title>
 
+<!-- Google Fonts for Premium Typography -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JCCN0D4FF4"></script>
 <script>
@@ -14,162 +19,176 @@
 </script>
 
 <style>
+/* 1. UPDATED BACKGROUND TO MATCH LOGO THEME */
 body {
-  font-family: Arial;
-  margin:0;
-  background: linear-gradient(#f7f7f7, #eaeaea);
-}
-
-/* OWNER TAG */
-.owner-tag {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: rgba(0,0,0,0.75);
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  background: radial-gradient(circle at center, #102a4f 0%, #061226 100%);
+  background-attachment: fixed;
   color: white;
-  font-size: 11px;
-  padding: 6px 10px;
-  border-radius: 12px;
-  z-index: 999;
-  backdrop-filter: blur(5px);
 }
 
 /* HEADER */
 .header {
-  text-align:center;
-  padding:25px 15px 10px;
+  text-align: center;
+  padding: 40px 15px 10px;
 }
 
 .logo {
-  width:120px;
-  height:120px;
-  border-radius:50%;
-  object-fit:cover;
-  border:4px solid gold;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #D4AF37; /* Gold border from logo.png.jpg */
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
+/* --- AUTOMATIC COLOR CHANGING ANIMATION --- */
+@keyframes goldPulse {
+  0% {
+    background: linear-gradient(to bottom, #f9e195 0%, #d4af37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.4));
+  }
+  50% {
+    background: linear-gradient(to bottom, #ffffff 0%, #f9e195 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
+  }
+  100% {
+    background: linear-gradient(to bottom, #f9e195 0%, #d4af37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.4));
+  }
+}
+
+/* 2. SAVY CART TEXT: FONT & COLOR CHANGING EFFECT */
 .title {
-  font-size:28px;
-  font-weight:bold;
-  margin-top:10px;
-  color:#222;
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: bold;
+  margin-top: 15px;
+  letter-spacing: 1px;
+  
+  display: inline-block;
+  /* Animation added here */
+  animation: goldPulse 3s infinite ease-in-out;
 }
 
 /* SEARCH */
 .search {
-  display:flex;
-  justify-content:center;
-  margin:20px 10px;
+  display: flex;
+  justify-content: center;
+  margin: 30px 10px;
 }
 
 .search-box {
-  width:85%;
-  max-width:420px;
-  display:flex;
-  background:white;
-  border-radius:30px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.15);
-  overflow:hidden;
+  width: 85%;
+  max-width: 420px;
+  display: flex;
+  background: rgba(255, 255, 255, 0.05); /* Semi-transparent dark look */
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 30px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
 }
 
 .search-box input {
-  flex:1;
-  border:none;
-  padding:14px;
-  outline:none;
-  font-size:15px;
+  flex: 1;
+  border: none;
+  padding: 14px;
+  outline: none;
+  font-size: 15px;
+  background: transparent;
+  color: white;
 }
 
 .search-box span {
-  padding:14px 16px;
-  cursor:pointer;
-  background:gold;
-  font-weight:bold;
+  padding: 14px 20px;
+  cursor: pointer;
+  background: #D4AF37; /* Gold theme */
+  color: #061226;
+  font-weight: bold;
 }
 
 /* PRODUCTS GRID */
 .products {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* PC */
-  gap: 10px;
-  padding: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* CARD */
 .card {
-  background:white;
-  padding:10px;
-  text-align:center;
-  border-radius:14px;
-  transition:0.2s;
-  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 15px;
+  text-align: center;
+  border-radius: 18px;
+  transition: 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .card:hover {
-  transform:scale(1.04);
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #D4AF37;
 }
 
-/* IMAGE */
 .card img {
-  width:100%;
-  max-width:150px;
-  height:150px;
-  object-fit:cover;
-  border-radius:12px;
-  display:block;
-  margin:0 auto;
+  width: 100%;
+  max-width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+  margin: 0 auto;
 }
 
-/* REMOVE UNDERLINE */
 .card a {
-  text-decoration:none;
-  color:inherit;
+  text-decoration: none;
+  color: inherit;
 }
 
-/* TEXT */
 .card h4 {
-  margin:8px 0 0;
-  font-size:13px;
-  color:#333;
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: #f1f1f1;
+  font-weight: 400;
 }
 
-/* 📱 MOBILE = 2 COLUMNS */
+/* MOBILE = 2 COLUMNS */
 @media (max-width: 600px) {
   .products {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 10px;
+    padding: 10px;
   }
-
-  .card img {
-    height: 110px;
-  }
-
-  .card h4 {
-    font-size: 12px;
-  }
+  .title { font-size: 28px; }
+  .card img { height: 120px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- OWNER TAG -->
-<div class="owner-tag">
-  managed by Savy Cart owners: Hamjad, Bilal
-</div>
-
 <!-- HEADER -->
 <div class="header">
-  <img src="logo.png" class="logo">
-  <div class="title">Savy Cart</div>
+  <img src="logo.png.jpg" class="logo">
+  <br>
+  <div class="title">SAVY CART</div>
 </div>
 
 <!-- SEARCH -->
 <div class="search">
   <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Search products..." onkeyup="searchProducts()">
-    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="Search premium products..." onkeyup="searchProducts()">
+    <span>??</span>
   </div>
 </div>
 
@@ -178,29 +197,29 @@ body {
 
   <div class="card">
     <a href="https://www.youtube.com/@SAVYCART232" target="_blank">
-      <img src="logo.png">
+      <img src="logo.png.jpg">
       <h4>YouTube Channel</h4>
     </a>
   </div>
 
   <div class="card">
     <a href="#">
-      <img src="https://via.placeholder.com/150">
-      <h4>Product 1</h4>
+      <img src="https://via.placeholder.com/150/102a4f/ffffff?text=Product+1">
+      <h4>Premium Watch</h4>
     </a>
   </div>
 
   <div class="card">
     <a href="#">
-      <img src="https://via.placeholder.com/150">
-      <h4>Product 2</h4>
+      <img src="https://via.placeholder.com/150/102a4f/ffffff?text=Product+2">
+      <h4>Smart Gadget</h4>
     </a>
   </div>
 
   <div class="card">
     <a href="#">
-      <img src="https://via.placeholder.com/150">
-      <h4>Product 3</h4>
+      <img src="https://via.placeholder.com/150/102a4f/ffffff?text=Product+3">
+      <h4>Luxury Decor</h4>
     </a>
   </div>
 
