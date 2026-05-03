@@ -168,6 +168,41 @@ body {
   .title { font-size: 28px; }
   .card img { height: 120px; }
 }
+
+/* WHATSAPP FLOAT BUTTON */
+.whatsapp-float {
+  position: fixed;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 999;
+}
+
+.whatsapp-float a {
+  display: block;
+  background: #25D366;
+  color: white;
+  padding: 12px 14px;
+  border-radius: 12px 0 0 12px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  transition: 0.3s;
+}
+
+.whatsapp-float a:hover {
+  background: #1ebe5d;
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .whatsapp-float a {
+    font-size: 11px;
+    padding: 10px;
+  }
+}
 </style>
 </head>
 
@@ -216,6 +251,13 @@ body {
     </a>
   </div>
 
+</div>
+
+<!-- WHATSAPP FLOAT BUTTON -->
+<div class="whatsapp-float">
+  <a href="https://chat.whatsapp.com/JSJcyBr3AKxEdymj04mIlZ" target="_blank">
+    Join WhatsApp<br>for Exclusive Deals
+  </a>
 </div>
 
 <script>
