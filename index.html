@@ -34,7 +34,6 @@
       border-radius: 8px;
       margin: 8px;
       cursor: pointer;
-      text-transform: capitalize;
       font-weight: bold;
     }
     button:active { background: #333; }
@@ -52,6 +51,28 @@
       padding: 12px;
     }
     .char-grid button:active { background: #0056b3; }
+    
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 95vw;
+      max-width: 600px;
+      margin-bottom: 8px;
+    }
+    #back-btn {
+      background: #888;
+      font-size: 13px;
+      padding: 6px 12px;
+      margin: 0;
+      border-radius: 6px;
+    }
+    #current-player {
+      margin: 0;
+      color: #535353;
+      font-size: 16px;
+    }
+
     canvas {
       border: 1px solid #ddd;
       background: #fff;
@@ -62,28 +83,28 @@
 </head>
 <body>
 
-  <!-- Screen 1: Start Interface -->
   <div id="start-screen" class="screen">
     <h1 style="font-size: 32px; color: #535353; margin-bottom: 20px;">Dino Game</h1>
     <button id="play-btn">PLAY</button>
   </div>
 
-  <!-- Screen 2: Character Selection -->
   <div id="char-screen" class="screen hidden">
     <h2 style="color: #535353;">Select Character Sound</h2>
     <div class="char-grid" id="char-grid"></div>
   </div>
 
-  <!-- Screen 3: Gameplay -->
   <div id="game-screen" class="screen hidden">
-    <h3 id="current-player" style="margin: 5px; color: #535353;"></h3>
+    <div class="game-header">
+      <button id="back-btn">‹ Change Character</button>
+      <h3 id="current-player"></h3>
+    </div>
     <canvas id="game" width="600" height="150"></canvas>
     <p style="color: #777;">Tap screen or press Space to jump</p>
-    <button id="back-btn" style="background: #888; font-size: 14px; padding: 8px 16px;">Change Character</button>
   </div>
 
   <script>
-    const members = ['azmil', 'bilal', 'ali', 'munees', 'munavvar', 'muhaz'];
+    // Capitalized names for UI display
+    const members = ['Azmil', 'Bilal', 'Ali', 'Munees', 'Munavvar', 'Muhaz'];
     let jumpSound, loseSound;
 
     const startScreen = document.getElementById('start-screen');
@@ -107,7 +128,7 @@
 
     members.forEach(member => {
       const btn = document.createElement('button');
-      btn.innerText = member;
+      btn.innerText = member; // Displays capitalized name on button
       btn.onclick = () => selectCharacter(member);
       charGrid.appendChild(btn);
     });
@@ -124,9 +145,16 @@
     };
 
     function selectCharacter(name) {
-      jumpSound = new Audio(`${name}1.mp3`);
-      loseSound = new Audio(`${name}2.mp3`);
-      playerTitle.innerText = `Player: ${name.toUpperCase()}`;
+      // Audio filename targets lowercase files (e.g. azmil1.mp3)
+      const cleanFilePrefix = name.toLowerCase();
+      jumpSound = new Audio(`${cleanFilePrefix}1.mp3`);
+      loseSound = new Audio(`${cleanFilePrefix}2.mp3`);
+      
+      jumpSound.load();
+      loseSound.load();
+
+      // UI header displays capitalized name
+      playerTitle.innerText = `Player: ${name}`;
 
       charScreen.classList.add('hidden');
       gameScreen.classList.remove('hidden');
@@ -142,8 +170,10 @@
       if (dino.grounded) {
         dino.dy = dino.jumpPower;
         dino.grounded = false;
-        jumpSound.currentTime = 0;
-        jumpSound.play().catch(() => {});
+        if (jumpSound) {
+          jumpSound.currentTime = 0;
+          jumpSound.play().catch(() => {});
+        }
       }
     }
 
@@ -160,10 +190,9 @@
 
     function spawnObstacle() {
       obstacle.x = canvas.width + Math.random() * 50;
-      // Crows spawn after score > 3 randomly
       if (score > 3 && Math.random() > 0.4) {
         obstacle.type = 'crow';
-        obstacle.y = 75; // Jumpable flying height
+        obstacle.y = 75;
         obstacle.w = 30;
         obstacle.h = 20;
       } else {
@@ -180,7 +209,6 @@
       tick++;
       groundOffset = (groundOffset + obstacle.speed) % 600;
 
-      // Dino physics
       dino.dy += dino.gravity;
       dino.y += dino.dy;
       if (dino.y >= GROUND_Y - dino.h) {
@@ -189,14 +217,12 @@
         dino.grounded = true;
       }
 
-      // Move Obstacle
       obstacle.x -= obstacle.speed;
       if (obstacle.x < -obstacle.w) {
         score++;
         spawnObstacle();
       }
 
-      // Collision Detection
       if (
         dino.x < obstacle.x + obstacle.w &&
         dino.x + dino.w > obstacle.x &&
@@ -204,28 +230,23 @@
         dino.y + dino.h > obstacle.y
       ) {
         gameOver = true;
-        loseSound.currentTime = 0;
-        loseSound.play().catch(() => {});
+        if (loseSound) {
+          loseSound.currentTime = 0;
+          loseSound.play().catch(() => {});
+        }
       }
     }
 
-    // --- SPRITE DRAWING FUNCTIONS ---
-
     function drawDino(x, y) {
       ctx.fillStyle = '#535353';
-      // Head
       ctx.fillRect(x + 10, y, 14, 10);
       ctx.fillRect(x + 20, y + 2, 6, 4);
-      ctx.clearRect(x + 12, y + 2, 2, 2); // Eye
-      // Body
+      ctx.clearRect(x + 12, y + 2, 2, 2);
       ctx.fillRect(x + 6, y + 10, 14, 14);
-      // Tail
       ctx.fillRect(x, y + 10, 6, 6);
       ctx.fillRect(x + 2, y + 16, 4, 4);
-      // Arm
       ctx.fillRect(x + 16, y + 14, 4, 2);
 
-      // Leg Running Animation
       if (!dino.grounded) {
         ctx.fillRect(x + 6, y + 24, 4, 10);
         ctx.fillRect(x + 14, y + 24, 4, 10);
@@ -235,7 +256,7 @@
           ctx.fillRect(x + 6, y + 24, 4, 10);
           ctx.fillRect(x + 14, y + 24, 4, 5);
         } else {
-          ctx.fillRect(x + 6, y + 24, 4, 5);
+          ctx.fillRect(x + 6, y + 24, 4, 10);
           ctx.fillRect(x + 14, y + 24, 4, 10);
         }
       }
@@ -243,32 +264,25 @@
 
     function drawCactus(x, y) {
       ctx.fillStyle = '#535353';
-      // Center Stem
       ctx.fillRect(x + 6, y, 8, 35);
-      // Left Arm
       ctx.fillRect(x, y + 10, 6, 4);
       ctx.fillRect(x, y + 6, 4, 8);
-      // Right Arm
       ctx.fillRect(x + 14, y + 14, 6, 4);
       ctx.fillRect(x + 16, y + 10, 4, 8);
     }
 
     function drawCrow(x, y) {
       ctx.fillStyle = '#535353';
-      // Body
       ctx.fillRect(x + 8, y + 6, 16, 8);
-      // Head & Beak
       ctx.fillRect(x, y + 4, 8, 6);
       ctx.fillRect(x - 4, y + 6, 4, 2);
-      // Tail
       ctx.fillRect(x + 24, y + 4, 6, 4);
 
-      // Wing Flap Animation
       const wingFrame = Math.floor(tick / 8) % 2;
       if (wingFrame === 0) {
-        ctx.fillRect(x + 12, y - 6, 6, 12); // Wing UP
+        ctx.fillRect(x + 12, y - 6, 6, 12);
       } else {
-        ctx.fillRect(x + 12, y + 10, 6, 10); // Wing DOWN
+        ctx.fillRect(x + 12, y + 10, 6, 10);
       }
     }
 
@@ -276,13 +290,18 @@
       ctx.fillStyle = '#535353';
       ctx.fillRect(0, GROUND_Y, canvas.width, 2);
 
-      // Moving Ground Specks
       for (let i = 0; i < canvas.width; i += 30) {
         let gx = (i - groundOffset) % canvas.width;
         if (gx < 0) gx += canvas.width;
         ctx.fillRect(gx, GROUND_Y + 4, 4, 2);
         ctx.fillRect((gx + 15) % canvas.width, GROUND_Y + 8, 2, 2);
       }
+    }
+
+    function drawWatermark() {
+      ctx.fillStyle = 'rgba(120, 120, 120, 0.55)';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('manchatttyyyy', 10, 142);
     }
 
     function draw() {
@@ -297,7 +316,8 @@
         drawCrow(obstacle.x, obstacle.y);
       }
 
-      // Score Display
+      drawWatermark();
+
       ctx.fillStyle = '#535353';
       ctx.font = 'bold 16px sans-serif';
       ctx.fillText(`HI ${score}`, 520, 25);
