@@ -1,276 +1,335 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Savy Cart</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JCCN0D4FF4"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-JCCN0D4FF4');
-</script>
-
-<style>
-body {
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  background: radial-gradient(circle at center, #102a4f 0%, #061226 100%);
-  background-attachment: fixed;
-  color: white;
-}
-
-/* HEADER */
-.header {
-  text-align: center;
-  padding: 40px 15px 10px;
-}
-
-/* LOGO */
-.logo {
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #D4AF37;
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.6));
-}
-
-@keyframes goldPulse {
-  0% {
-    background: linear-gradient(to bottom, #f9e195 0%, #d4af37 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.4));
-  }
-  50% {
-    background: linear-gradient(to bottom, #ffffff 0%, #f9e195 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
-  }
-  100% {
-    background: linear-gradient(to bottom, #f9e195 0%, #d4af37 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.4));
-  }
-}
-
-.title {
-  font-family: 'Playfair Display', serif;
-  font-size: 36px;
-  font-weight: bold;
-  margin-top: 15px;
-  letter-spacing: 1px;
-  display: inline-block;
-  animation: goldPulse 3s infinite ease-in-out;
-}
-
-/* SEARCH */
-.search {
-  display: flex;
-  justify-content: center;
-  margin: 30px 10px;
-}
-
-.search-box {
-  width: 85%;
-  max-width: 420px;
-  display: flex;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  border-radius: 30px;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
-
-.search-box input {
-  flex: 1;
-  border: none;
-  padding: 14px;
-  outline: none;
-  font-size: 15px;
-  background: transparent;
-  color: white;
-}
-
-.search-box span {
-  padding: 14px 20px;
-  cursor: pointer;
-  background: #D4AF37;
-  color: #061226;
-  font-weight: bold;
-}
-
-/* PRODUCTS GRID */
-.products {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* CARD */
-.card {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 15px;
-  text-align: center;
-  border-radius: 18px;
-  transition: 0.3s;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.12);
-  border-color: #D4AF37;
-}
-
-/* IMAGE */
-.card img {
-  width: 100%;
-  max-width: 250px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 12px;
-  display: block;
-  margin: 0 auto;
-}
-
-.card a {
-  text-decoration: none;
-  color: inherit;
-}
-
-.card h4 {
-  margin: 12px 0 0;
-  font-size: 14px;
-  color: #f1f1f1;
-  font-weight: 400;
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-  .products {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    padding: 10px;
-  }
-  .title { font-size: 28px; }
-  .card img { height: 120px; }
-}
-
-/* WHATSAPP FLOAT BUTTON */
-.whatsapp-float {
-  position: fixed;
-  right: 10px;
-  top: 10%;
-  transform: translateY(-50%);
-  z-index: 999;
-}
-
-.whatsapp-float a {
-  display: block;
-  background: #25D366;
-  color: white;
-  padding: 12px 14px;
-  border-radius: 12px 0 0 12px;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: bold;
-  text-align: center;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  transition: 0.3s;
-}
-
-.whatsapp-float a:hover {
-  background: #1ebe5d;
-  transform: scale(1.05);
-}
-
-@media (max-width: 600px) {
-  .whatsapp-float a {
-    font-size: 11px;
-    padding: 10px;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Classic Custom Dino Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      touch-action: manipulation;
+    }
+    .screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      text-align: center;
+    }
+    .hidden { display: none !important; }
+    button {
+      background: #535353;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 18px;
+      border-radius: 8px;
+      margin: 8px;
+      cursor: pointer;
+      text-transform: capitalize;
+      font-weight: bold;
+    }
+    button:active { background: #333; }
+    .char-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 15px;
+      width: 80%;
+      max-width: 300px;
+    }
+    .char-grid button {
+      background: #007bff;
+      margin: 0;
+      padding: 12px;
+    }
+    .char-grid button:active { background: #0056b3; }
+    canvas {
+      border: 1px solid #ddd;
+      background: #fff;
+      max-width: 95vw;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="header">
-  <img src="logo.png" class="logo">
-  <br>
-  <div class="title">SAVY CART</div>
-</div>
-
-<div class="search">
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Search premium products..." onkeyup="searchProducts()">
-    <span>🔍</span>
-  </div>
-</div>
-
-<div class="products">
-
-  <div class="card">
-    <a href="https://www.youtube.com/@SAVYCART232" target="_blank">
-      <img src="logo.png">
-      <h4>YouTube Channel</h4>
-    </a>
+  <!-- Screen 1: Start Interface -->
+  <div id="start-screen" class="screen">
+    <h1 style="font-size: 32px; color: #535353; margin-bottom: 20px;">Dino Game</h1>
+    <button id="play-btn">PLAY</button>
   </div>
 
-  <div class="card">
-    <a href="#">
-      <img src="https://via.placeholder.com/150/102a4f/ffffff?text=Product+1">
-      <h4>Premium Watch</h4>
-    </a>
+  <!-- Screen 2: Character Selection -->
+  <div id="char-screen" class="screen hidden">
+    <h2 style="color: #535353;">Select Character Sound</h2>
+    <div class="char-grid" id="char-grid"></div>
   </div>
 
-  <div class="card">
-    <a href="#">
-      <img src="https://via.placeholder.com/150/102a4f/ffffff?text=Product+2">
-      <h4>Smart Gadget</h4>
-    </a>
+  <!-- Screen 3: Gameplay -->
+  <div id="game-screen" class="screen hidden">
+    <h3 id="current-player" style="margin: 5px; color: #535353;"></h3>
+    <canvas id="game" width="600" height="150"></canvas>
+    <p style="color: #777;">Tap screen or press Space to jump</p>
+    <button id="back-btn" style="background: #888; font-size: 14px; padding: 8px 16px;">Change Character</button>
   </div>
 
-  <div class="card">
-    <a href="#">
-      <img src="https://via.placeholder.com/150/102a4f/ffffff?text=Product+3">
-      <h4>Luxury Decor</h4>
-    </a>
-  </div>
+  <script>
+    const members = ['azmil', 'bilal', 'ali', 'munees', 'munavvar', 'muhaz'];
+    let jumpSound, loseSound;
 
-</div>
+    const startScreen = document.getElementById('start-screen');
+    const charScreen = document.getElementById('char-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const charGrid = document.getElementById('char-grid');
+    const playerTitle = document.getElementById('current-player');
+    
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
 
-<!-- WHATSAPP FLOAT BUTTON -->
-<div class="whatsapp-float">
-  <a href="https://chat.whatsapp.com/JSJcyBr3AKxEdymj04mIlZ" target="_blank">
-    Join WhatsApp<br>for Exclusive Deals
-  </a>
-</div>
+    const GROUND_Y = 125;
+    let dino = { x: 50, y: GROUND_Y - 34, w: 26, h: 34, dy: 0, gravity: 0.6, jumpPower: -10.5, grounded: false };
+    let obstacle = { x: 600, y: 90, w: 20, h: 35, type: 'cactus', speed: 6 };
+    
+    let gameOver = false;
+    let score = 0;
+    let tick = 0;
+    let groundOffset = 0;
+    let animationFrame;
 
-<script>
-function searchProducts() {
-  let input = document.getElementById("searchInput").value.toLowerCase();
-  let cards = document.getElementsByClassName("card");
+    members.forEach(member => {
+      const btn = document.createElement('button');
+      btn.innerText = member;
+      btn.onclick = () => selectCharacter(member);
+      charGrid.appendChild(btn);
+    });
 
-  for (let i = 0; i < cards.length; i++) {
-    let text = cards[i].innerText.toLowerCase();
-    cards[i].style.display = text.includes(input) ? "block" : "none";
-  }
-}
-</script>
+    document.getElementById('play-btn').onclick = () => {
+      startScreen.classList.add('hidden');
+      charScreen.classList.remove('hidden');
+    };
 
+    document.getElementById('back-btn').onclick = () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      gameScreen.classList.add('hidden');
+      charScreen.classList.remove('hidden');
+    };
+
+    function selectCharacter(name) {
+      jumpSound = new Audio(`${name}1.mp3`);
+      loseSound = new Audio(`${name}2.mp3`);
+      playerTitle.innerText = `Player: ${name.toUpperCase()}`;
+
+      charScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+
+      restart();
+    }
+
+    function jump() {
+      if (gameOver) {
+        restart();
+        return;
+      }
+      if (dino.grounded) {
+        dino.dy = dino.jumpPower;
+        dino.grounded = false;
+        jumpSound.currentTime = 0;
+        jumpSound.play().catch(() => {});
+      }
+    }
+
+    function restart() {
+      dino.y = GROUND_Y - dino.h;
+      dino.dy = 0;
+      spawnObstacle();
+      score = 0;
+      tick = 0;
+      gameOver = false;
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      loop();
+    }
+
+    function spawnObstacle() {
+      obstacle.x = canvas.width + Math.random() * 50;
+      // Crows spawn after score > 3 randomly
+      if (score > 3 && Math.random() > 0.4) {
+        obstacle.type = 'crow';
+        obstacle.y = 75; // Jumpable flying height
+        obstacle.w = 30;
+        obstacle.h = 20;
+      } else {
+        obstacle.type = 'cactus';
+        obstacle.y = GROUND_Y - 35;
+        obstacle.w = 20;
+        obstacle.h = 35;
+      }
+    }
+
+    function update() {
+      if (gameOver) return;
+
+      tick++;
+      groundOffset = (groundOffset + obstacle.speed) % 600;
+
+      // Dino physics
+      dino.dy += dino.gravity;
+      dino.y += dino.dy;
+      if (dino.y >= GROUND_Y - dino.h) {
+        dino.y = GROUND_Y - dino.h;
+        dino.dy = 0;
+        dino.grounded = true;
+      }
+
+      // Move Obstacle
+      obstacle.x -= obstacle.speed;
+      if (obstacle.x < -obstacle.w) {
+        score++;
+        spawnObstacle();
+      }
+
+      // Collision Detection
+      if (
+        dino.x < obstacle.x + obstacle.w &&
+        dino.x + dino.w > obstacle.x &&
+        dino.y < obstacle.y + obstacle.h &&
+        dino.y + dino.h > obstacle.y
+      ) {
+        gameOver = true;
+        loseSound.currentTime = 0;
+        loseSound.play().catch(() => {});
+      }
+    }
+
+    // --- SPRITE DRAWING FUNCTIONS ---
+
+    function drawDino(x, y) {
+      ctx.fillStyle = '#535353';
+      // Head
+      ctx.fillRect(x + 10, y, 14, 10);
+      ctx.fillRect(x + 20, y + 2, 6, 4);
+      ctx.clearRect(x + 12, y + 2, 2, 2); // Eye
+      // Body
+      ctx.fillRect(x + 6, y + 10, 14, 14);
+      // Tail
+      ctx.fillRect(x, y + 10, 6, 6);
+      ctx.fillRect(x + 2, y + 16, 4, 4);
+      // Arm
+      ctx.fillRect(x + 16, y + 14, 4, 2);
+
+      // Leg Running Animation
+      if (!dino.grounded) {
+        ctx.fillRect(x + 6, y + 24, 4, 10);
+        ctx.fillRect(x + 14, y + 24, 4, 10);
+      } else {
+        const legFrame = Math.floor(tick / 6) % 2;
+        if (legFrame === 0) {
+          ctx.fillRect(x + 6, y + 24, 4, 10);
+          ctx.fillRect(x + 14, y + 24, 4, 5);
+        } else {
+          ctx.fillRect(x + 6, y + 24, 4, 5);
+          ctx.fillRect(x + 14, y + 24, 4, 10);
+        }
+      }
+    }
+
+    function drawCactus(x, y) {
+      ctx.fillStyle = '#535353';
+      // Center Stem
+      ctx.fillRect(x + 6, y, 8, 35);
+      // Left Arm
+      ctx.fillRect(x, y + 10, 6, 4);
+      ctx.fillRect(x, y + 6, 4, 8);
+      // Right Arm
+      ctx.fillRect(x + 14, y + 14, 6, 4);
+      ctx.fillRect(x + 16, y + 10, 4, 8);
+    }
+
+    function drawCrow(x, y) {
+      ctx.fillStyle = '#535353';
+      // Body
+      ctx.fillRect(x + 8, y + 6, 16, 8);
+      // Head & Beak
+      ctx.fillRect(x, y + 4, 8, 6);
+      ctx.fillRect(x - 4, y + 6, 4, 2);
+      // Tail
+      ctx.fillRect(x + 24, y + 4, 6, 4);
+
+      // Wing Flap Animation
+      const wingFrame = Math.floor(tick / 8) % 2;
+      if (wingFrame === 0) {
+        ctx.fillRect(x + 12, y - 6, 6, 12); // Wing UP
+      } else {
+        ctx.fillRect(x + 12, y + 10, 6, 10); // Wing DOWN
+      }
+    }
+
+    function drawGround() {
+      ctx.fillStyle = '#535353';
+      ctx.fillRect(0, GROUND_Y, canvas.width, 2);
+
+      // Moving Ground Specks
+      for (let i = 0; i < canvas.width; i += 30) {
+        let gx = (i - groundOffset) % canvas.width;
+        if (gx < 0) gx += canvas.width;
+        ctx.fillRect(gx, GROUND_Y + 4, 4, 2);
+        ctx.fillRect((gx + 15) % canvas.width, GROUND_Y + 8, 2, 2);
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawGround();
+      drawDino(dino.x, dino.y);
+
+      if (obstacle.type === 'cactus') {
+        drawCactus(obstacle.x, obstacle.y);
+      } else {
+        drawCrow(obstacle.x, obstacle.y);
+      }
+
+      // Score Display
+      ctx.fillStyle = '#535353';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText(`HI ${score}`, 520, 25);
+
+      if (gameOver) {
+        ctx.fillText('G A M E   O V E R', 220, 65);
+        ctx.font = '14px sans-serif';
+        ctx.fillText('Tap screen to restart', 230, 85);
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      if (!gameOver) {
+        animationFrame = requestAnimationFrame(loop);
+      }
+    }
+
+    window.addEventListener('touchstart', (e) => {
+      if (!gameScreen.classList.contains('hidden') && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        jump();
+      }
+    }, { passive: false });
+
+    window.addEventListener('keydown', (e) => {
+      if (!gameScreen.classList.contains('hidden') && (e.code === 'Space' || e.code === 'ArrowUp')) {
+        e.preventDefault();
+        jump();
+      }
+    });
+  </script>
 </body>
 </html>
