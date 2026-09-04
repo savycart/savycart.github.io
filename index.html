@@ -103,7 +103,6 @@
   </div>
 
   <script>
-    // Capitalized names for UI display
     const members = ['Azmil', 'Bilal', 'Ali', 'Munees', 'Munavvar', 'Muhaz'];
     let jumpSound, loseSound;
 
@@ -128,7 +127,7 @@
 
     members.forEach(member => {
       const btn = document.createElement('button');
-      btn.innerText = member; // Displays capitalized name on button
+      btn.innerText = member;
       btn.onclick = () => selectCharacter(member);
       charGrid.appendChild(btn);
     });
@@ -145,16 +144,15 @@
     };
 
     function selectCharacter(name) {
-      // Audio filename targets lowercase files (e.g. azmil1.mp3)
-      const cleanFilePrefix = name.toLowerCase();
-      jumpSound = new Audio(`${cleanFilePrefix}1.mp3`);
-      loseSound = new Audio(`${cleanFilePrefix}2.mp3`);
+      // Formats file request to match capitalized GitHub files (e.g. Bilal1.mp3)
+      const formattedName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+      jumpSound = new Audio(`${formattedName}1.mp3`);
+      loseSound = new Audio(`${formattedName}2.mp3`);
       
       jumpSound.load();
       loseSound.load();
 
-      // UI header displays capitalized name
-      playerTitle.innerText = `Player: ${name}`;
+      playerTitle.innerText = `Player: ${formattedName}`;
 
       charScreen.classList.add('hidden');
       gameScreen.classList.remove('hidden');
@@ -192,8 +190,8 @@
       obstacle.x = canvas.width + Math.random() * 50;
       if (score > 3 && Math.random() > 0.4) {
         obstacle.type = 'crow';
-        obstacle.y = 75;
-        obstacle.w = 30;
+        obstacle.y = GROUND_Y - 32; // Lowered flight height so jumping easily clears it
+        obstacle.w = 28;
         obstacle.h = 20;
       } else {
         obstacle.type = 'cactus';
@@ -223,11 +221,13 @@
         spawnObstacle();
       }
 
+      // Hitbox padding (4px inset) for accurate, forgiving collisions
+      const pad = 4;
       if (
-        dino.x < obstacle.x + obstacle.w &&
-        dino.x + dino.w > obstacle.x &&
-        dino.y < obstacle.y + obstacle.h &&
-        dino.y + dino.h > obstacle.y
+        dino.x + pad < obstacle.x + obstacle.w - pad &&
+        dino.x + dino.w - pad > obstacle.x + pad &&
+        dino.y + pad < obstacle.y + obstacle.h - pad &&
+        dino.y + dino.h - pad > obstacle.y + pad
       ) {
         gameOver = true;
         if (loseSound) {
@@ -256,7 +256,7 @@
           ctx.fillRect(x + 6, y + 24, 4, 10);
           ctx.fillRect(x + 14, y + 24, 4, 5);
         } else {
-          ctx.fillRect(x + 6, y + 24, 4, 10);
+          ctx.fillRect(x + 6, y + 24, 4, 5);
           ctx.fillRect(x + 14, y + 24, 4, 10);
         }
       }
