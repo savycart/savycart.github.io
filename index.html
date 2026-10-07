@@ -92,7 +92,7 @@
         @keyframes typing { from { width: 0 } to { width: 100% } }
         @keyframes blink { from, to { border-color: transparent } 50% { border-color: var(--accent-glow); } }
 
-        .auth-input {
+        .auth-input, .auth-select {
             width: 100%;
             padding: 14px 18px;
             background: rgba(3, 7, 18, 0.6);
@@ -100,15 +100,19 @@
             border-radius: 12px;
             color: white;
             font-size: 1rem;
-            text-align: center;
             outline: none;
             margin-bottom: 20px;
             transition: all 0.3s;
         }
 
-        .auth-input:focus {
+        .auth-input:focus, .auth-select:focus {
             border-color: var(--accent-glow);
             box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+        }
+
+        .auth-select option {
+            background: #030712;
+            color: white;
         }
 
         .btn {
@@ -236,14 +240,12 @@
             transform: translateY(-3px);
         }
 
-        /* Single tap active glow state */
         .card.active-glow {
             border-color: var(--accent-glow);
             box-shadow: 0 0 25px var(--accent-glow);
             background: rgba(6, 182, 212, 0.1);
         }
 
-        /* Selection mode state */
         .card.selected {
             border-color: var(--danger) !important;
             box-shadow: 0 0 20px rgba(244, 63, 94, 0.4) !important;
@@ -254,12 +256,27 @@
             font-size: 1.2rem;
             margin-bottom: 8px;
             color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .card p {
             color: var(--text-muted);
             font-size: 0.9rem;
             word-break: break-all;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-thumb {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            background: #000;
         }
 
         /* Floating Plus Action Button */
@@ -352,6 +369,34 @@
             background: rgba(255, 255, 255, 0.08);
             color: var(--text-main);
         }
+
+        /* Media Viewer Overlay */
+        #mediaViewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+        #mediaViewer.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #mediaViewer img, #mediaViewer video {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(6, 182, 212, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -363,6 +408,11 @@
         <span id="selectedCount">0 selected</span>
         <button class="delete-btn" onclick="deleteSelectedItems()">Delete Selected</button>
         <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="clearSelection()">Cancel</button>
+    </div>
+
+    <!-- MEDIA VIEWER MODAL -->
+    <div id="mediaViewer" onclick="closeMediaViewer()">
+        <div id="mediaContainer" style="position: relative;" onclick="event.stopPropagation()"></div>
     </div>
 
     <!-- PASSWORD SCREEN -->
@@ -381,7 +431,7 @@
     <div id="homeScreen" class="screen hidden">
         <div class="dashboard-header">
             <div class="dashboard-title">
-                <h1>ICCHAS AREA OKEY</h1>
+                <h1>MY PRIVATE SPACE</h1>
                 <p>Welcome back, Master</p>
             </div>
             <button class="btn nav-back-btn" onclick="lockScreen()">Lock Session</button>
@@ -398,14 +448,14 @@
         <div class="dashboard-header">
             <div class="dashboard-title">
                 <h1 id="currentFolderTitle">FOLDER</h1>
-                <p>Stored Links & Resources</p>
+                <p>Stored Links, Photos & Videos</p>
             </div>
             <button class="btn nav-back-btn" onclick="backToDashboard()">← Back Home</button>
         </div>
-        <div id="linkGrid" class="grid-container"></div>
+        <div id="itemGrid" class="grid-container"></div>
         <div class="fab-container">
-            <div class="fab-label">ADD LINK</div>
-            <button class="fab" onclick="openLinkModal()">+</button>
+            <div class="fab-label">ADD ITEM</div>
+            <button class="fab" onclick="openItemModal()">+</button>
         </div>
     </div>
 
@@ -413,7 +463,7 @@
     <div id="folderModal" class="modal-overlay">
         <div class="modal">
             <h3>Create New Folder</h3>
-            <input type="text" id="newFolderName" class="auth-input" placeholder="Folder Name (e.g. Work, Tools)" style="margin-bottom: 0;">
+            <input type="text" id="newFolderName" class="auth-input" placeholder="Folder Name (e.g. Gallery, Docs)" style="margin-bottom: 0;">
             <div class="modal-buttons">
                 <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
                 <button class="btn" onclick="createFolder()">Create</button>
@@ -421,15 +471,29 @@
         </div>
     </div>
 
-    <!-- NEW LINK MODAL -->
-    <div id="linkModal" class="modal-overlay">
+    <!-- ADD ITEM MODAL (Link, Photo, Video) -->
+    <div id="itemModal" class="modal-overlay">
         <div class="modal">
-            <h3>Add New Link</h3>
-            <input type="text" id="newLinkTitle" class="auth-input" placeholder="Site/Link Name" style="margin-bottom: 12px;">
-            <input type="text" id="newLinkUrl" class="auth-input" placeholder="URL (e.g. https://google.com)" style="margin-bottom: 0;">
+            <h3>Add New Item</h3>
+            <select id="itemTypeSelect" class="auth-select" onchange="switchItemInputs()">
+                <option value="link">🔗 Web Link</option>
+                <option value="photo">📷 Photo</option>
+                <option value="video">🎥 Video</option>
+            </select>
+            
+            <input type="text" id="itemTitle" class="auth-input" placeholder="Item Name / Title" style="margin-bottom: 12px;">
+            
+            <!-- Dynamic field for Link URL or File upload -->
+            <div id="urlFieldContainer">
+                <input type="text" id="itemUrl" class="auth-input" placeholder="URL (e.g. https://google.com)" style="margin-bottom: 0;">
+            </div>
+            <div id="fileFieldContainer" style="display: none;">
+                <input type="file" id="itemFile" class="auth-input" style="margin-bottom: 0; padding: 10px;" accept="image/*,video/*">
+            </div>
+
             <div class="modal-buttons">
                 <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
-                <button class="btn" onclick="createLink()">Save Link</button>
+                <button class="btn" onclick="createItem()">Save Item</button>
             </div>
         </div>
     </div>
@@ -499,8 +563,7 @@
         let currentView = "home"; // "home" or "folder"
         let activeFolder = null;
         let selectedIndices = new Set();
-
-        function handleLogin(e) {
+                function handleLogin(e) {
             e.preventDefault();
             const val = document.getElementById('passwordInput').value;
             const err = document.getElementById('errorMsg');
@@ -528,21 +591,20 @@
             }, 400);
         }
 
-        // --- LOCAL STORAGE DATA STRUCTURE ---
+        // --- LOCAL STORAGE DATABASE ---
         function getDatabase() {
-            return JSON.parse(localStorage.getItem('master_db')) || {
+            return JSON.parse(localStorage.getItem('master_db_media')) || {
                 folders: [
-                    { name: "Journal", links: [{ title: "My Diary", url: "#" }] },
-                    { name: "Secrets", links: [{ title: "Console", url: "https://github.com" }] }
+                    { name: "Journal", items: [{ type: "link", title: "My Diary", content: "#" }] }
                 ]
             };
         }
 
         function saveDatabase(db) {
-            localStorage.setItem('master_db', JSON.stringify(db));
+            localStorage.setItem('master_db_media', JSON.stringify(db));
         }
 
-        // --- INTERACTION HANDLERS (Tap, Double Tap, Long Press) ---
+        // --- INTERACTIONS (Tap, Double Tap, Long Press) ---
         function setupCardInteractions(cardElement, index, clickAction, doubleClickAction) {
             let tapTimeout = null;
             let longPressTimer = null;
@@ -553,7 +615,7 @@
                 longPressTimer = setTimeout(() => {
                     isLongPress = true;
                     toggleSelection(index, cardElement);
-                }, 600); // 600ms hold for selection
+                }, 600);
             });
 
             cardElement.addEventListener('pointerup', (e) => {
@@ -561,16 +623,13 @@
                 if (isLongPress) return;
 
                 if (selectedIndices.size > 0) {
-                    // If selection mode is active, tap just toggles selection
                     toggleSelection(index, cardElement);
                     return;
                 }
 
-                // Handle single tap vs double tap
                 if (!tapTimeout) {
                     tapTimeout = setTimeout(() => {
                         tapTimeout = null;
-                        // Single Tap Action (Glow)
                         document.querySelectorAll('.card').forEach(c => c.classList.remove('active-glow'));
                         cardElement.classList.add('active-glow');
                         if(clickAction) clickAction();
@@ -578,7 +637,6 @@
                 } else {
                     clearTimeout(tapTimeout);
                     tapTimeout = null;
-                    // Double Tap Action (Open)
                     if(doubleClickAction) doubleClickAction();
                 }
             });
@@ -624,12 +682,12 @@
                 card.innerHTML = `
                     <div style="font-size: 32px; margin-bottom: 12px;">📁</div>
                     <h3>${folder.name}</h3>
-                    <p>${folder.links.length} saved item(s)</p>
+                    <p>${folder.items.length} saved item(s)</p>
                 `;
 
                 setupCardInteractions(card, index, 
-                    () => {}, // Single tap glow
-                    () => openFolder(folder.name) // Double tap open
+                    () => {}, 
+                    () => openFolder(folder.name)
                 );
 
                 grid.appendChild(card);
@@ -643,7 +701,7 @@
             document.getElementById('homeScreen').classList.add('hidden');
             document.getElementById('folderViewScreen').classList.remove('hidden');
             document.getElementById('currentFolderTitle').textContent = folderName.toUpperCase();
-            loadLinks();
+            loadItems();
         }
 
         function backToDashboard() {
@@ -653,32 +711,69 @@
             loadFolders();
         }
 
-        // --- LOAD LINKS (INSIDE FOLDER) ---
-        function loadLinks() {
+        // --- LOAD ITEMS (LINKS, PHOTOS, VIDEOS) ---
+        function loadItems() {
             clearSelection();
-            const grid = document.getElementById('linkGrid');
+            const grid = document.getElementById('itemGrid');
             const db = getDatabase();
             const folder = db.folders.find(f => f.name === activeFolder);
             
             grid.innerHTML = "";
             if (!folder) return;
 
-            folder.links.forEach((link, index) => {
+            folder.items.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `
-                    <div style="font-size: 32px; margin-bottom: 12px;">🔗</div>
-                    <h3>${link.title}</h3>
-                    <p>${link.url}</p>
-                `;
+
+                if (item.type === 'photo') {
+                    card.innerHTML = `
+                        <img src="${item.content}" class="card-thumb">
+                        <h3>📷 ${item.title}</h3>
+                        <p>Photo File</p>
+                    `;
+                } else if (item.type === 'video') {
+                    card.innerHTML = `
+                        <video src="${item.content}" class="card-thumb" muted></video>
+                        <h3>🎥 ${item.title}</h3>
+                        <p>Video File</p>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div style="font-size: 32px; margin-bottom: 12px;">🔗</div>
+                        <h3>${item.title}</h3>
+                        <p>${item.content}</p>
+                    `;
+                }
 
                 setupCardInteractions(card, index,
-                    () => {}, // Single tap glow
-                    () => { if(link.url && link.url !== '#') window.open(link.url, '_blank'); } // Double tap open link
+                    () => {}, 
+                    () => {
+                        if (item.type === 'link') {
+                            if (item.content && item.content !== '#') window.open(item.content, '_blank');
+                        } else if (item.type === 'photo') {
+                            showMediaViewer(`<img src="${item.content}">`);
+                        } else if (item.type === 'video') {
+                            showMediaViewer(`<video src="${item.content}" controls autoplay></video>`);
+                        }
+                    }
                 );
 
                 grid.appendChild(card);
             });
+        }
+
+        // --- MEDIA VIEWER ---
+        function showMediaViewer(htmlContent) {
+            const viewer = document.getElementById('mediaViewer');
+            const container = document.getElementById('mediaContainer');
+            container.innerHTML = htmlContent;
+            viewer.classList.add('active');
+        }
+
+        function closeMediaViewer() {
+            const viewer = document.getElementById('mediaViewer');
+            viewer.classList.remove('active');
+            document.getElementById('mediaContainer').innerHTML = "";
         }
 
         // --- DELETION LOGIC ---
@@ -686,12 +781,11 @@
             const db = getDatabase();
             
             if (currentView === "home") {
-                // Filter out deleted folders
                 db.folders = db.folders.filter((_, idx) => !selectedIndices.has(idx));
             } else if (currentView === "folder") {
                 const folder = db.folders.find(f => f.name === activeFolder);
                 if (folder) {
-                    folder.links = folder.links.filter((_, idx) => !selectedIndices.has(idx));
+                    folder.items = folder.items.filter((_, idx) => !selectedIndices.has(idx));
                 }
             }
 
@@ -699,7 +793,7 @@
             clearSelection();
 
             if (currentView === "home") loadFolders();
-            else loadLinks();
+            else loadItems();
         }
 
         // --- MODAL CONTROLS ---
@@ -708,16 +802,33 @@
             document.getElementById('newFolderName').focus();
         }
 
-        function openLinkModal() {
-            document.getElementById('linkModal').classList.add('active');
-            document.getElementById('newLinkTitle').focus();
+        function openItemModal() {
+            document.getElementById('itemModal').classList.add('active');
+            document.getElementById('itemTitle').focus();
         }
 
         function closeModals() {
             document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
             document.getElementById('newFolderName').value = "";
-            document.getElementById('newLinkTitle').value = "";
-            document.getElementById('newLinkUrl').value = "";
+            document.getElementById('itemTitle').value = "";
+            document.getElementById('itemUrl').value = "";
+            document.getElementById('itemFile').value = "";
+            document.getElementById('itemTypeSelect').value = "link";
+            switchItemInputs();
+        }
+
+        function switchItemInputs() {
+            const type = document.getElementById('itemTypeSelect').value;
+            const urlContainer = document.getElementById('urlFieldContainer');
+            const fileContainer = document.getElementById('fileFieldContainer');
+
+            if (type === 'link') {
+                urlContainer.style.display = 'block';
+                fileContainer.style.display = 'none';
+            } else {
+                urlContainer.style.display = 'none';
+                fileContainer.style.display = 'block';
+            }
         }
 
         function createFolder() {
@@ -725,28 +836,43 @@
             if (!name) return;
 
             const db = getDatabase();
-            db.folders.push({ name: name, links: [] });
+            db.folders.push({ name: name, items: [] });
             saveDatabase(db);
             closeModals();
             loadFolders();
         }
 
-        function createLink() {
-            const title = document.getElementById('newLinkTitle').value.trim();
-            let url = document.getElementById('newLinkUrl').value.trim();
+        function createItem() {
+            const type = document.getElementById('itemTypeSelect').value;
+            const title = document.getElementById('itemTitle').value.trim();
             if (!title) return;
-            if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-                url = 'https://' + url;
-            }
 
             const db = getDatabase();
             const folder = db.folders.find(f => f.name === activeFolder);
-            if (folder) {
-                folder.links.push({ title: title, url: url || '#' });
+            if (!folder) return;
+
+            if (type === 'link') {
+                let url = document.getElementById('itemUrl').value.trim();
+                if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'https://' + url;
+                }
+                folder.items.push({ type: 'link', title: title, content: url || '#' });
                 saveDatabase(db);
+                closeModals();
+                loadItems();
+            } else {
+                const fileInput = document.getElementById('itemFile');
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        folder.items.push({ type: type, title: title, content: e.target.result });
+                        saveDatabase(db);
+                        closeModals();
+                        loadItems();
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                }
             }
-            closeModals();
-            loadLinks();
         }
     </script>
 </body>
