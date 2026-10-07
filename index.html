@@ -21,6 +21,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            user-select: none;
         }
 
         body {
@@ -33,7 +34,6 @@
             align-items: center;
         }
 
-        /* Neural Network Canvas Background */
         #neuralCanvas {
             position: fixed;
             top: 0;
@@ -44,7 +44,6 @@
             background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
         }
 
-        /* Container Layouts */
         .screen {
             position: absolute;
             width: 100%;
@@ -53,7 +52,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transition: opacity 0.6s ease, transform 0.6s ease;
             padding: 20px;
         }
 
@@ -63,7 +62,7 @@
             transform: scale(0.95);
         }
 
-        /* Intro & Password Screen */
+        /* Auth Screen */
         .auth-card {
             background: var(--panel-bg);
             border: 1px solid rgba(6, 182, 212, 0.3);
@@ -87,7 +86,7 @@
             white-space: nowrap;
             overflow: hidden;
             width: 0;
-            animation: typing 2.5s steps(20, end) forwards, blink 0.75s infinite;
+            animation: typing 2s steps(20, end) forwards, blink 0.75s infinite;
         }
 
         @keyframes typing { from { width: 0 } to { width: 100% } }
@@ -137,8 +136,8 @@
             height: 20px;
         }
 
-        /* Homepage Dashboard Layout */
-        #homeScreen {
+        /* Dashboard & Folder Screens */
+        #homeScreen, #folderViewScreen {
             justify-content: flex-start;
             align-items: flex-start;
             padding: 40px;
@@ -170,6 +169,47 @@
             text-transform: uppercase;
         }
 
+        .nav-back-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            width: auto;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            border-radius: 10px;
+        }
+
+        /* Selection Action Toolbar */
+        .selection-bar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--danger);
+            padding: 12px 24px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(244, 63, 94, 0.3);
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .selection-bar.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
         /* Grid Cards Layout */
         .grid-container {
             display: grid;
@@ -185,15 +225,29 @@
             border-radius: 18px;
             padding: 24px;
             backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .card:hover {
+            border-color: rgba(6, 182, 212, 0.5);
+            transform: translateY(-3px);
+        }
+
+        /* Single tap active glow state */
+        .card.active-glow {
             border-color: var(--accent-glow);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.15);
+            box-shadow: 0 0 25px var(--accent-glow);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        /* Selection mode state */
+        .card.selected {
+            border-color: var(--danger) !important;
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.4) !important;
+            background: rgba(244, 63, 94, 0.1) !important;
         }
 
         .card h3 {
@@ -205,6 +259,7 @@
         .card p {
             color: var(--text-muted);
             font-size: 0.9rem;
+            word-break: break-all;
         }
 
         /* Floating Plus Action Button */
@@ -226,7 +281,6 @@
             font-size: 0.85rem;
             letter-spacing: 1px;
             backdrop-filter: blur(8px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .fab {
@@ -250,7 +304,7 @@
             box-shadow: 0 0 45px rgba(6, 182, 212, 0.8);
         }
 
-        /* Modal Popup Dialog */
+        /* Modal Dialog */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -262,7 +316,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 2000;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -298,16 +352,18 @@
             background: rgba(255, 255, 255, 0.08);
             color: var(--text-main);
         }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: none;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Neural Network Animated Background -->
     <canvas id="neuralCanvas"></canvas>
+
+    <!-- SELECTION DELETION TOOLBAR -->
+    <div id="selectionBar" class="selection-bar">
+        <span id="selectedCount">0 selected</span>
+        <button class="delete-btn" onclick="deleteSelectedItems()">Delete Selected</button>
+        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="clearSelection()">Cancel</button>
+    </div>
 
     <!-- PASSWORD SCREEN -->
     <div id="authScreen" class="screen">
@@ -325,38 +381,61 @@
     <div id="homeScreen" class="screen hidden">
         <div class="dashboard-header">
             <div class="dashboard-title">
-                <h1>MY PRIVATE SPACE</h1>
+                <h1>ICCHAS AREA OKEY</h1>
                 <p>Welcome back, Master</p>
             </div>
-            <button class="btn" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" onclick="lockScreen()">Lock Session</button>
+            <button class="btn nav-back-btn" onclick="lockScreen()">Lock Session</button>
         </div>
-
-        <!-- Dynamic Folder Grid Cards -->
-        <div id="folderGrid" class="grid-container">
-            <!-- Items injected dynamically -->
-        </div>
-
-        <!-- Floating Action Plus Button -->
+        <div id="folderGrid" class="grid-container"></div>
         <div class="fab-container">
-            <div class="fab-label">PLUS</div>
-            <button class="fab" onclick="openModal()">+</button>
+            <div class="fab-label">NEW FOLDER</div>
+            <button class="fab" onclick="openFolderModal()">+</button>
         </div>
     </div>
 
-    <!-- NEW FOLDER POPUP MODAL -->
-    <div id="modalOverlay" class="modal-overlay">
+    <!-- FOLDER CONTENTS SCREEN -->
+    <div id="folderViewScreen" class="screen hidden">
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <h1 id="currentFolderTitle">FOLDER</h1>
+                <p>Stored Links & Resources</p>
+            </div>
+            <button class="btn nav-back-btn" onclick="backToDashboard()">← Back Home</button>
+        </div>
+        <div id="linkGrid" class="grid-container"></div>
+        <div class="fab-container">
+            <div class="fab-label">ADD LINK</div>
+            <button class="fab" onclick="openLinkModal()">+</button>
+        </div>
+    </div>
+
+    <!-- NEW FOLDER MODAL -->
+    <div id="folderModal" class="modal-overlay">
         <div class="modal">
             <h3>Create New Folder</h3>
-            <input type="text" id="folderNameInput" class="auth-input" placeholder="Folder Name (e.g. Ideas, Secrets)" style="margin-bottom: 0;">
+            <input type="text" id="newFolderName" class="auth-input" placeholder="Folder Name (e.g. Work, Tools)" style="margin-bottom: 0;">
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
                 <button class="btn" onclick="createFolder()">Create</button>
             </div>
         </div>
     </div>
 
+    <!-- NEW LINK MODAL -->
+    <div id="linkModal" class="modal-overlay">
+        <div class="modal">
+            <h3>Add New Link</h3>
+            <input type="text" id="newLinkTitle" class="auth-input" placeholder="Site/Link Name" style="margin-bottom: 12px;">
+            <input type="text" id="newLinkUrl" class="auth-input" placeholder="URL (e.g. https://google.com)" style="margin-bottom: 0;">
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
+                <button class="btn" onclick="createLink()">Save Link</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // --- 1. NEURAL NETWORK ANIMATION ---
+        // --- BACKGROUND ANIMATION ---
         const canvas = document.getElementById('neuralCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -415,33 +494,33 @@
         }
         animateNeuralNet();
 
-        // --- 2. AUTHENTICATION LOGIC ---
+        // --- APP STATE & LOGIC ---
         const MASTER_PASSWORD = "abdulhamjad";
+        let currentView = "home"; // "home" or "folder"
+        let activeFolder = null;
+        let selectedIndices = new Set();
 
         function handleLogin(e) {
             e.preventDefault();
-            const inputVal = document.getElementById('passwordInput').value;
-            const errorMsg = document.getElementById('errorMsg');
+            const val = document.getElementById('passwordInput').value;
+            const err = document.getElementById('errorMsg');
 
-            if (inputVal === MASTER_PASSWORD) {
-                errorMsg.textContent = "";
+            if (val === MASTER_PASSWORD) {
+                err.textContent = "";
                 document.getElementById('authScreen').classList.add('hidden');
                 setTimeout(() => {
                     document.getElementById('homeScreen').classList.remove('hidden');
+                    currentView = "home";
                     loadFolders();
                 }, 400);
             } else {
-                errorMsg.textContent = "ACCESS DENIED";
+                err.textContent = "ACCESS DENIED";
                 document.getElementById('passwordInput').value = "";
-                // Quick error shake effect
-                const card = document.querySelector('.auth-card');
-                card.style.transform = 'translateX(10px)';
-                setTimeout(() => card.style.transform = 'translateX(-10px)', 100);
-                setTimeout(() => card.style.transform = 'translateX(0)', 200);
             }
         }
 
         function lockScreen() {
+            clearSelection();
             document.getElementById('homeScreen').classList.add('hidden');
             document.getElementById('passwordInput').value = "";
             setTimeout(() => {
@@ -449,46 +528,225 @@
             }, 400);
         }
 
-        // --- 3. DYNAMIC FOLDER / ITEM MANAGEMENT ---
-        function getStoredFolders() {
-            return JSON.parse(localStorage.getItem('master_folders')) || [
-                { name: "Journal", desc: "Private logs and thoughts" },
-                { name: "Secrets", desc: "Secure links & credentials" }
-            ];
+        // --- LOCAL STORAGE DATA STRUCTURE ---
+        function getDatabase() {
+            return JSON.parse(localStorage.getItem('master_db')) || {
+                folders: [
+                    { name: "Journal", links: [{ title: "My Diary", url: "#" }] },
+                    { name: "Secrets", links: [{ title: "Console", url: "https://github.com" }] }
+                ]
+            };
         }
 
+        function saveDatabase(db) {
+            localStorage.setItem('master_db', JSON.stringify(db));
+        }
+
+        // --- INTERACTION HANDLERS (Tap, Double Tap, Long Press) ---
+        function setupCardInteractions(cardElement, index, clickAction, doubleClickAction) {
+            let tapTimeout = null;
+            let longPressTimer = null;
+            let isLongPress = false;
+
+            cardElement.addEventListener('pointerdown', (e) => {
+                isLongPress = false;
+                longPressTimer = setTimeout(() => {
+                    isLongPress = true;
+                    toggleSelection(index, cardElement);
+                }, 600); // 600ms hold for selection
+            });
+
+            cardElement.addEventListener('pointerup', (e) => {
+                clearTimeout(longPressTimer);
+                if (isLongPress) return;
+
+                if (selectedIndices.size > 0) {
+                    // If selection mode is active, tap just toggles selection
+                    toggleSelection(index, cardElement);
+                    return;
+                }
+
+                // Handle single tap vs double tap
+                if (!tapTimeout) {
+                    tapTimeout = setTimeout(() => {
+                        tapTimeout = null;
+                        // Single Tap Action (Glow)
+                        document.querySelectorAll('.card').forEach(c => c.classList.remove('active-glow'));
+                        cardElement.classList.add('active-glow');
+                        if(clickAction) clickAction();
+                    }, 250);
+                } else {
+                    clearTimeout(tapTimeout);
+                    tapTimeout = null;
+                    // Double Tap Action (Open)
+                    if(doubleClickAction) doubleClickAction();
+                }
+            });
+
+            cardElement.addEventListener('pointercancel', () => clearTimeout(longPressTimer));
+        }
+
+        function toggleSelection(index, cardElement) {
+            if (selectedIndices.has(index)) {
+                selectedIndices.delete(index);
+                cardElement.classList.remove('selected');
+            } else {
+                selectedIndices.add(index);
+                cardElement.classList.add('selected');
+            }
+
+            const bar = document.getElementById('selectionBar');
+            if (selectedIndices.size > 0) {
+                bar.classList.add('active');
+                document.getElementById('selectedCount').textContent = `${selectedIndices.size} selected`;
+            } else {
+                bar.classList.remove('active');
+            }
+        }
+
+        function clearSelection() {
+            selectedIndices.clear();
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('selectionBar').classList.remove('active');
+        }
+
+        // --- LOAD FOLDERS (HOME) ---
         function loadFolders() {
+            currentView = "home";
+            clearSelection();
             const grid = document.getElementById('folderGrid');
-            const folders = getStoredFolders();
+            const db = getDatabase();
             
-            grid.innerHTML = folders.map(f => `
-                <div class="card">
-                    <h3>📁 ${f.name}</h3>
-                    <p>${f.desc || 'Custom folder category'}</p>
-                </div>
-            `).join('');
+            grid.innerHTML = "";
+            db.folders.forEach((folder, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div style="font-size: 32px; margin-bottom: 12px;">📁</div>
+                    <h3>${folder.name}</h3>
+                    <p>${folder.links.length} saved item(s)</p>
+                `;
+
+                setupCardInteractions(card, index, 
+                    () => {}, // Single tap glow
+                    () => openFolder(folder.name) // Double tap open
+                );
+
+                grid.appendChild(card);
+            });
         }
 
-        function openModal() {
-            document.getElementById('modalOverlay').classList.add('active');
-            document.getElementById('folderNameInput').focus();
+        function openFolder(folderName) {
+            currentView = "folder";
+            activeFolder = folderName;
+            clearSelection();
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('folderViewScreen').classList.remove('hidden');
+            document.getElementById('currentFolderTitle').textContent = folderName.toUpperCase();
+            loadLinks();
         }
 
-        function closeModal() {
-            document.getElementById('modalOverlay').classList.remove('active');
-            document.getElementById('folderNameInput').value = "";
+        function backToDashboard() {
+            clearSelection();
+            document.getElementById('folderViewScreen').classList.add('hidden');
+            document.getElementById('homeScreen').classList.remove('hidden');
+            loadFolders();
+        }
+
+        // --- LOAD LINKS (INSIDE FOLDER) ---
+        function loadLinks() {
+            clearSelection();
+            const grid = document.getElementById('linkGrid');
+            const db = getDatabase();
+            const folder = db.folders.find(f => f.name === activeFolder);
+            
+            grid.innerHTML = "";
+            if (!folder) return;
+
+            folder.links.forEach((link, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div style="font-size: 32px; margin-bottom: 12px;">🔗</div>
+                    <h3>${link.title}</h3>
+                    <p>${link.url}</p>
+                `;
+
+                setupCardInteractions(card, index,
+                    () => {}, // Single tap glow
+                    () => { if(link.url && link.url !== '#') window.open(link.url, '_blank'); } // Double tap open link
+                );
+
+                grid.appendChild(card);
+            });
+        }
+
+        // --- DELETION LOGIC ---
+        function deleteSelectedItems() {
+            const db = getDatabase();
+            
+            if (currentView === "home") {
+                // Filter out deleted folders
+                db.folders = db.folders.filter((_, idx) => !selectedIndices.has(idx));
+            } else if (currentView === "folder") {
+                const folder = db.folders.find(f => f.name === activeFolder);
+                if (folder) {
+                    folder.links = folder.links.filter((_, idx) => !selectedIndices.has(idx));
+                }
+            }
+
+            saveDatabase(db);
+            clearSelection();
+
+            if (currentView === "home") loadFolders();
+            else loadLinks();
+        }
+
+        // --- MODAL CONTROLS ---
+        function openFolderModal() {
+            document.getElementById('folderModal').classList.add('active');
+            document.getElementById('newFolderName').focus();
+        }
+
+        function openLinkModal() {
+            document.getElementById('linkModal').classList.add('active');
+            document.getElementById('newLinkTitle').focus();
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            document.getElementById('newFolderName').value = "";
+            document.getElementById('newLinkTitle').value = "";
+            document.getElementById('newLinkUrl').value = "";
         }
 
         function createFolder() {
-            const name = document.getElementById('folderNameInput').value.trim();
+            const name = document.getElementById('newFolderName').value.trim();
             if (!name) return;
 
-            const folders = getStoredFolders();
-            folders.push({ name: name, desc: "Added via master control" });
-            localStorage.setItem('master_folders', JSON.stringify(folders));
-
+            const db = getDatabase();
+            db.folders.push({ name: name, links: [] });
+            saveDatabase(db);
+            closeModals();
             loadFolders();
-            closeModal();
+        }
+
+        function createLink() {
+            const title = document.getElementById('newLinkTitle').value.trim();
+            let url = document.getElementById('newLinkUrl').value.trim();
+            if (!title) return;
+            if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+
+            const db = getDatabase();
+            const folder = db.folders.find(f => f.name === activeFolder);
+            if (folder) {
+                folder.links.push({ title: title, url: url || '#' });
+                saveDatabase(db);
+            }
+            closeModals();
+            loadLinks();
         }
     </script>
 </body>
