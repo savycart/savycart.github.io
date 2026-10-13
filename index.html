@@ -128,7 +128,7 @@
       color: #202124;
     }
 
-    /* Game Screen Canvas Layout */
+    /* Game Screen Layout */
     #canvas-wrapper {
       position: relative;
       width: 1000px;
@@ -234,10 +234,9 @@
 
   let selectedCandidate = null;
   let playerImg = new Image();
-  let jumpAudio = null;
-  let dieAudio = null;
+  let jumpAudioSrc = '';
+  let dieAudioSrc = '';
 
-  // Populate candidate selection cards
   const candidateList = document.getElementById('candidate-list');
   CANDIDATES.forEach(cand => {
     const card = document.createElement('div');
@@ -293,9 +292,8 @@
   function selectCandidate(cand) {
     selectedCandidate = cand;
     playerImg.src = cand.baseImg + '1.png';
-    
-    jumpAudio = new Audio(cand.audio1);
-    dieAudio = new Audio(cand.audio2);
+    jumpAudioSrc = cand.audio1;
+    dieAudioSrc = cand.audio2;
 
     showScreen('screen-game');
     initGame();
@@ -321,7 +319,6 @@
 
   document.getElementById('hi-score-text').innerText = String(highScore).padStart(5, '0');
 
-  // PERFECT 1:1 SQUARE SIZE (60x60) so player face is an exact circle
   const player = {
     x: 80,
     y: 0,
@@ -372,13 +369,16 @@
   }
 
   function triggerJump() {
+    // Prevent jump and jump sound if game is over or not active
     if (!gameActive || isGameOver) return;
+    
     if (player.isGrounded) {
       player.velocityY = player.jumpPower;
       player.isGrounded = false;
-      if (jumpAudio) {
-        jumpAudio.currentTime = 0;
-        jumpAudio.play().catch(() => {});
+      if (jumpAudioSrc && !isGameOver) {
+        const overlapAudio = new Audio(jumpAudioSrc);
+        overlapAudio.volume = 1.0;
+        overlapAudio.play().catch(err => console.log("Jump audio play error:", err));
       }
     }
   }
@@ -393,9 +393,10 @@
       playerImg.src = selectedCandidate.img2;
     }
 
-    if (dieAudio) {
-      dieAudio.currentTime = 0;
-      dieAudio.play().catch(() => {});
+    if (dieAudioSrc) {
+      const dieAudio = new Audio(dieAudioSrc);
+      dieAudio.volume = 1.0;
+      dieAudio.play().catch(err => console.log("Die audio play error:", err));
     }
 
     if (score > highScore) {
@@ -409,9 +410,8 @@
 
   function initGame() {
     cancelAnimationFrame(animationFrameId);
-    obstacles = []; // Completely wipe out obstacles immediately
+    obstacles = []; 
     
-    // Spawn first cactus right near the beginning so player doesn't wait
     obstacles.push({ x: canvas.width + 100, y: player.groundY + player.size - 40, width: 28, height: 40, type: 'cactus' });
 
     gameActive = true;
@@ -533,8 +533,9 @@
     }
   });
 
-  const gameScreen = document.getElementById('screen-game');
-  gameScreen.addEventListener('pointerdown', (e) => {
+  // Full-screen tap/click handler on the entire canvas wrapper so touching anywhere on screen jumps
+  const canvasWrapper = document.getElementById('canvas-wrapper');
+  canvasWrapper.addEventListener('pointerdown', (e) => {
     if (e.target.tagName === 'BUTTON' || e.target.closest('#game-over-overlay')) return;
     triggerJump();
   });
