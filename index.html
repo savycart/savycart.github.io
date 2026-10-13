@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Dino Runner3</title>
+  <title>Dino Runner</title>
   <style>
     * {
       box-sizing: border-box;
@@ -172,6 +172,7 @@
       justify-content: center;
       align-items: center;
       gap: 16px;
+      z-index: 10;
     }
 
     #game-over-overlay.active {
@@ -215,7 +216,7 @@
       
       <div id="game-over-overlay">
         <div class="game-over-text">G A M E &nbsp; O V E R</div>
-        <button class="btn" onclick="restartGame(event)">Try Again</button>
+        <button class="btn" id="restart-btn" onclick="restartGame(event)">Try Again</button>
       </div>
     </div>
   </div>
@@ -223,7 +224,6 @@
 </div>
 
 <script>
-  // Candidate configuration
   const CANDIDATES = [
     { name: 'Hana',    baseImg: 'Hana',    img2: 'Hana2.png',    audio1: 'Hanaaudio1.mp3',    audio2: 'Hanaaudio2.mp3',    color: '#E91E63' },
     { name: 'Hadif',   baseImg: 'Hadif',   img2: 'Hadif2.png',   audio1: 'Hadifaudio1.mp3',   audio2: 'Hadifaudio2.mp3',   color: '#2196F3' },
@@ -315,7 +315,7 @@
   let isGameOver = false;
   let score = 0;
   let highScore = localStorage.getItem('dino_highscore') || 0;
-  let gameSpeed = 6;
+  let gameSpeed = 7;
   let frameCount = 0;
   let animationFrameId;
 
@@ -327,8 +327,8 @@
     y: 0,
     size: 60,
     velocityY: 0,
-    gravity: 0.7,
-    jumpPower: -13,
+    gravity: 0.75,
+    jumpPower: -13.5,
     groundY: 300,
     isGrounded: true
   };
@@ -386,7 +386,7 @@
   function gameOver() {
     if (isGameOver) return;
     isGameOver = true;
-    gameActive = false; // Stop game loop updates immediately
+    gameActive = false;
     cancelAnimationFrame(animationFrameId);
     
     if (selectedCandidate) {
@@ -409,11 +409,15 @@
 
   function initGame() {
     cancelAnimationFrame(animationFrameId);
-    obstacles = []; // Wipe out all obstacles so player never restarts stuck
+    obstacles = []; // Completely wipe out obstacles immediately
+    
+    // Spawn first cactus right near the beginning so player doesn't wait
+    obstacles.push({ x: canvas.width + 100, y: player.groundY + player.size - 40, width: 28, height: 40, type: 'cactus' });
+
     gameActive = true;
     isGameOver = false;
     score = 0;
-    gameSpeed = 6;
+    gameSpeed = 7;
     frameCount = 0;
     
     player.y = player.groundY;
@@ -429,7 +433,10 @@
   }
 
   function restartGame(e) {
-    if(e) e.stopPropagation();
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     initGame();
   }
 
@@ -452,8 +459,8 @@
         player.isGrounded = true;
       }
 
-      if (frameCount % Math.max(60, Math.floor(1200 / gameSpeed)) === 0) {
-        if (Math.random() > 0.3) {
+      if (frameCount % Math.max(50, Math.floor(1000 / gameSpeed)) === 0) {
+        if (Math.random() > 0.25) {
           spawnObstacle();
         }
       }
