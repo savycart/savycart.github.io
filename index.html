@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Dino Runner</title>
   <style>
     * {
       box-sizing: border-box;
       user-select: none;
       -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
       margin: 0;
       padding: 0;
     }
@@ -139,8 +140,9 @@
       display: block;
       width: 100%;
       height: 400px;
-      border-bottom: 2px solid #535353;
+      /* Removed bottom CSS border to prevent double ground lines */
       cursor: pointer;
+      outline: none;
     }
 
     .game-header {
@@ -166,7 +168,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       flex-direction: column;
       justify-content: center;
       align-items: center;
@@ -254,7 +256,7 @@
     } catch(e){}
   }
 
-  // Populate candidate selection cards with smart image format checks
+  // Populate candidate selection cards with robust image format checks
   const candidateList = document.getElementById('candidate-list');
   CANDIDATES.forEach(cand => {
     const card = document.createElement('div');
@@ -332,42 +334,34 @@
   let isGameOver = false;
   let score = 0;
   let highScore = localStorage.getItem('dino_highscore') || 0;
-  let gameSpeed = 6;
+  let gameSpeed = 7;
   let frameCount = 0;
   let animationFrameId;
 
   document.getElementById('hi-score-text').innerText = String(highScore).padStart(5, '0');
 
+  // Strict equal width and height (54x54) to ensure face is a PERFECT circle, not an oval
   const player = {
     x: 80,
     y: 0,
-    width: 60,
-    height: 60,
+    size: 54,
     velocityY: 0,
-    gravity: 0.7,
-    jumpPower: -13,
+    gravity: 0.75,
+    jumpPower: -13.5,
     groundY: 310,
     isGrounded: true
   };
 
   let obstacles = [];
 
-  function drawCactus(ctx, x, y, width, height, type) {
+  function drawCactus(ctx, x, y, width, height) {
     ctx.fillStyle = "#535353";
-    if (type === 'single') {
-      ctx.fillRect(x + width*0.35, y, width*0.3, height);
-      ctx.fillRect(x, y + height*0.3, width*0.35, height*0.12);
-      ctx.fillRect(x, y + height*0.15, width*0.12, height*0.25);
-      ctx.fillRect(x + width*0.65, y + height*0.4, width*0.35, height*0.12);
-      ctx.fillRect(x + width*0.88, y + height*0.25, width*0.12, height*0.25);
-    } else if (type === 'double') {
-      drawCactus(ctx, x, y + 10, width * 0.45, height - 10, 'single');
-      drawCactus(ctx, x + width * 0.5, y, width * 0.5, height, 'single');
-    } else {
-      drawCactus(ctx, x, y + 15, width * 0.3, height - 15, 'single');
-      drawCactus(ctx, x + width * 0.33, y, width * 0.35, height, 'single');
-      drawCactus(ctx, x + width * 0.7, y + 10, width * 0.3, height - 10, 'single');
-    }
+    // Clean, perfectly proportioned Google-style classic cactus
+    ctx.fillRect(x + width * 0.35, y, width * 0.3, height); // Main trunk
+    ctx.fillRect(x, y + height * 0.25, width * 0.35, height * 0.12); // Left arm base
+    ctx.fillRect(x, y + height * 0.1, width * 0.12, height * 0.25); // Left arm up
+    ctx.fillRect(x + width * 0.65, y + height * 0.4, width * 0.35, height * 0.12); // Right arm base
+    ctx.fillRect(x + width * 0.88, y + height * 0.25, width * 0.12, height * 0.25); // Right arm up
   }
 
   function drawBird(ctx, x, y, width, height, frame) {
@@ -388,13 +382,12 @@
       const birdY = Math.random() > 0.5 ? 230 : 270;
       obstacles.push({ x: canvas.width, y: birdY, width: 46, height: 32, type: 'bird' });
     } else {
-      const cactusTypes = ['single', 'double', 'triple'];
-      const cType = cactusTypes[Math.floor(Math.random() * cactusTypes.length)];
-      let w = 34;
-      if (cType === 'double') w = 55;
-      if (cType === 'triple') w = 75;
+      const scale = Math.random();
+      let w = 26, h = 42;
+      if (scale > 0.6) { w = 48; h = 46; } // Double
+      else if (scale > 0.3) { w = 38; h = 44; } // Medium
 
-      obstacles.push({ x: canvas.width, y: player.groundY + player.height - 55, width: w, height: 55, type: cType });
+      obstacles.push({ x: canvas.width, y: player.groundY + player.size - h, width: w, height: h, type: 'cactus' });
     }
   }
 
@@ -439,9 +432,9 @@
     gameActive = true;
     isGameOver = false;
     score = 0;
-    gameSpeed = 6;
+    gameSpeed = 7;
     frameCount = 0;
-    obstacles = []; // Completely clear any active obstacles on start/restart
+    obstacles = [];
     
     player.y = player.groundY;
     player.velocityY = 0;
@@ -459,6 +452,7 @@
 
   function restartGame(e) {
     if(e) e.stopPropagation();
+    obstacles = [];
     initGame();
   }
 
@@ -481,19 +475,19 @@
         player.isGrounded = true;
       }
 
-      if (frameCount % Math.max(60, Math.floor(1200 / gameSpeed)) === 0) {
-        if (Math.random() > 0.3) {
+      if (frameCount % Math.max(55, Math.floor(1100 / gameSpeed)) === 0) {
+        if (Math.random() > 0.25) {
           spawnObstacle();
         }
       }
     }
 
-    // Render Ground Line
+    // Render Single Clean Ground Line
     ctx.strokeStyle = '#535353';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(0, player.groundY + player.height);
-    ctx.lineTo(canvas.width, player.groundY + player.height);
+    ctx.moveTo(0, player.groundY + player.size);
+    ctx.lineTo(canvas.width, player.groundY + player.size);
     ctx.stroke();
 
     // Render Obstacles & Check Collisions
@@ -506,15 +500,15 @@
       if (obs.type === 'bird') {
         drawBird(ctx, obs.x, obs.y, obs.width, obs.height, frameCount);
       } else {
-        drawCactus(ctx, obs.x, obs.y, obs.width, obs.height, obs.type);
+        drawCactus(ctx, obs.x, obs.y, obs.width, obs.height);
       }
 
       const padding = 6;
       if (
         player.x + padding < obs.x + obs.width &&
-        player.x + player.width - padding > obs.x &&
+        player.x + player.size - padding > obs.x &&
         player.y + padding < obs.y + obs.height &&
-        player.y + player.height - padding > obs.y
+        player.y + player.size - padding > obs.y
       ) {
         if (!isGameOver) gameOver();
       }
@@ -524,24 +518,24 @@
       }
     }
 
-    // Render Player Character Face inside circular cutout with CLASSIC BLACK border (#535353)
+    // Render Player Character Face in a PERFECT circular cutout with black border
     ctx.save();
     ctx.beginPath();
-    ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width/2, 0, Math.PI * 2);
+    ctx.arc(player.x + player.size/2, player.y + player.size/2, player.size/2, 0, Math.PI * 2);
     ctx.closePath();
     ctx.clip();
     
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+    ctx.fillRect(player.x, player.y, player.size, player.size);
     
-    ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+    ctx.drawImage(playerImg, player.x, player.y, player.size, player.size);
     ctx.restore();
 
-    // Classic black border ring (#535353) around character face
+    // Perfect circular black border ring (#535353)
     ctx.strokeStyle = '#535353';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width/2 - 1.5, 0, Math.PI * 2);
+    ctx.arc(player.x + player.size/2, player.y + player.size/2, player.size/2 - 1.5, 0, Math.PI * 2);
     ctx.stroke();
 
     document.getElementById('score-text').innerText = String(Math.floor(score)).padStart(5, '0');
