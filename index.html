@@ -117,7 +117,7 @@
       border-radius: 50%;
       object-fit: cover;
       background-color: #f1f3f4;
-      border: 3px solid #1a73e8;
+      border: 3px solid #535353;
       margin-bottom: 12px;
     }
 
@@ -222,13 +222,13 @@
 </div>
 
 <script>
-  // List of candidate profiles
+  // Candidate configuration
   const CANDIDATES = [
-    { name: 'Hana',    img1: 'Hana1.png',    img2: 'Hana2.png',    audio1: 'Hanaaudio1.mp3',    audio2: 'Hanaaudio2.mp3',    color: '#E91E63' },
-    { name: 'Hadif',   img1: 'Hadif1.png',   img2: 'Hadif2.png',   audio1: 'Hadifaudio1.mp3',   audio2: 'Hadifaudio2.mp3',   color: '#2196F3' },
-    { name: 'Naja',    img1: 'Naja1.png',    img2: 'Naja2.png',    audio1: 'Najaaudio1.mp3',    audio2: 'Najaaudio2.mp3',    color: '#9C27B0' },
-    { name: 'Arafath', img1: 'Arafath1.png', img2: 'Arafath2.png', audio1: 'Arafathaudio1.mp3', audio2: 'Arafathaudio2.mp3', color: '#4CAF50' },
-    { name: 'Afra',    img1: 'Afra1.png',    img2: 'Afra2.png',    audio1: 'Afraaudio1.mp3',    audio2: 'Afraaudio2.mp3',    color: '#FF9800' }
+    { name: 'Hana',    baseImg: 'Hana',    img2: 'Hana2.png',    audio1: 'Hanaaudio1.mp3',    audio2: 'Hanaaudio2.mp3',    color: '#E91E63' },
+    { name: 'Hadif',   baseImg: 'Hadif',   img2: 'Hadif2.png',   audio1: 'Hadifaudio1.mp3',   audio2: 'Hadifaudio2.mp3',   color: '#2196F3' },
+    { name: 'Naja',    baseImg: 'Naja',    img2: 'Naja2.png',    audio1: 'Najaaudio1.mp3',    audio2: 'Najaaudio2.mp3',    color: '#9C27B0' },
+    { name: 'Arafath', baseImg: 'Arafath', img2: 'Arafath2.png', audio1: 'Arafathaudio1.mp3', audio2: 'Arafathaudio2.mp3', color: '#4CAF50' },
+    { name: 'Afra',    baseImg: 'Afra',    img2: 'Afra2.png',    audio1: 'Afraaudio1.mp3',    audio2: 'Afraaudio2.mp3',    color: '#FF9800' }
   ];
 
   let selectedCandidate = null;
@@ -236,7 +236,7 @@
   let jumpAudio = null;
   let dieAudio = null;
 
-  // Audio Context Fallback Synthesizer for instant sound feedback if MP3s aren't uploaded yet
+  // Audio Context Fallback Synthesizer
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   function playSynthBeep(freq, type, duration) {
     try {
@@ -254,7 +254,7 @@
     } catch(e){}
   }
 
-  // Populate candidate selection cards
+  // Populate candidate selection cards with smart image format checks
   const candidateList = document.getElementById('candidate-list');
   CANDIDATES.forEach(cand => {
     const card = document.createElement('div');
@@ -263,17 +263,32 @@
     
     const img = document.createElement('img');
     img.className = 'avatar-cutout';
-    img.src = cand.img1;
+    
+    // Try loading .png first, then .jpg, then .jpeg
+    let attempt = 1;
+    img.src = cand.baseImg + '1.png';
+    
     img.onerror = function() {
-      // Create SVG Avatar fallback if custom PNG image is missing
-      this.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="40" fill="${cand.color}"/>
-          <circle cx="40" cy="30" r="16" fill="#ffffff"/>
-          <path d="M 16 68 C 16 50, 64 50, 64 68 Z" fill="#ffffff"/>
-          <text x="40" y="35" font-family="sans-serif" font-weight="bold" font-size="16" fill="${cand.color}" text-anchor="middle">${cand.name[0]}</text>
-        </svg>`
-      );
+      if (attempt === 1) {
+        attempt = 2;
+        this.src = cand.baseImg + '1.JPG';
+      } else if (attempt === 2) {
+        attempt = 3;
+        this.src = cand.baseImg + '1.jpg';
+      } else if (attempt === 3) {
+        attempt = 4;
+        this.src = cand.baseImg + '1.jpeg';
+      } else {
+        // If no image is found in repository, display initial letter avatar
+        this.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="40" fill="${cand.color}"/>
+            <circle cx="40" cy="30" r="16" fill="#ffffff"/>
+            <path d="M 16 68 C 16 50, 64 50, 64 68 Z" fill="#ffffff"/>
+            <text x="40" y="35" font-family="sans-serif" font-weight="bold" font-size="16" fill="${cand.color}" text-anchor="middle">${cand.name[0]}</text>
+          </svg>`
+        );
+      }
     };
 
     const name = document.createElement('div');
@@ -285,7 +300,6 @@
     candidateList.appendChild(card);
   });
 
-  // Navigation functions
   function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
@@ -297,9 +311,8 @@
 
   function selectCandidate(cand) {
     selectedCandidate = cand;
-    playerImg.src = cand.img1;
+    playerImg.src = cand.baseImg + '1.png';
     
-    // Set sound triggers
     jumpAudio = new Audio(cand.audio1);
     dieAudio = new Audio(cand.audio2);
 
@@ -314,7 +327,6 @@
     showScreen('screen-candidate');
   }
 
-  // Canvas & Game Variables
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
   
@@ -328,7 +340,6 @@
 
   document.getElementById('hi-score-text').innerText = String(highScore).padStart(5, '0');
 
-  // Player object
   const player = {
     x: 80,
     y: 0,
@@ -343,86 +354,57 @@
 
   let obstacles = [];
 
-  // Custom Pixel-Art Google Cacti Drawers
   function drawCactus(ctx, x, y, width, height, type) {
     ctx.fillStyle = "#535353";
-    
     if (type === 'single') {
-      // Main stem
       ctx.fillRect(x + width*0.35, y, width*0.3, height);
-      // Left arm
       ctx.fillRect(x, y + height*0.3, width*0.35, height*0.12);
       ctx.fillRect(x, y + height*0.15, width*0.12, height*0.25);
-      // Right arm
       ctx.fillRect(x + width*0.65, y + height*0.4, width*0.35, height*0.12);
       ctx.fillRect(x + width*0.88, y + height*0.25, width*0.12, height*0.25);
     } else if (type === 'double') {
       drawCactus(ctx, x, y + 10, width * 0.45, height - 10, 'single');
       drawCactus(ctx, x + width * 0.5, y, width * 0.5, height, 'single');
-    } else { // Triple
+    } else {
       drawCactus(ctx, x, y + 15, width * 0.3, height - 15, 'single');
       drawCactus(ctx, x + width * 0.33, y, width * 0.35, height, 'single');
       drawCactus(ctx, x + width * 0.7, y + 10, width * 0.3, height - 10, 'single');
     }
   }
 
-  // Custom Google Bird Drawer
   function drawBird(ctx, x, y, width, height, frame) {
     ctx.fillStyle = "#535353";
-    // Body & Head
     ctx.fillRect(x + 10, y + 12, width - 15, 10);
-    ctx.fillRect(x, y + 8, 12, 8); // Head
-    ctx.fillRect(x - 6, y + 10, 6, 4); // Beak
-    
-    // Wings flapping logic
+    ctx.fillRect(x, y + 8, 12, 8);
+    ctx.fillRect(x - 6, y + 10, 6, 4);
     if (Math.floor(frame / 12) % 2 === 0) {
-      // Wing Up
       ctx.fillRect(x + 18, y - 10, 10, 22);
     } else {
-      // Wing Down
       ctx.fillRect(x + 18, y + 18, 10, 18);
     }
   }
 
-  // Spawn Obstacles
   function spawnObstacle() {
     const r = Math.random();
     if (score > 250 && r > 0.7) {
-      // Flying Bird
       const birdY = Math.random() > 0.5 ? 230 : 270;
-      obstacles.push({
-        x: canvas.width,
-        y: birdY,
-        width: 46,
-        height: 32,
-        type: 'bird'
-      });
+      obstacles.push({ x: canvas.width, y: birdY, width: 46, height: 32, type: 'bird' });
     } else {
-      // Cacti
       const cactusTypes = ['single', 'double', 'triple'];
       const cType = cactusTypes[Math.floor(Math.random() * cactusTypes.length)];
       let w = 34;
       if (cType === 'double') w = 55;
       if (cType === 'triple') w = 75;
 
-      obstacles.push({
-        x: canvas.width,
-        y: player.groundY + player.height - 55,
-        width: w,
-        height: 55,
-        type: cType
-      });
+      obstacles.push({ x: canvas.width, y: player.groundY + player.height - 55, width: w, height: 55, type: cType });
     }
   }
 
   function triggerJump() {
     if (!gameActive || isGameOver) return;
-    
     if (player.isGrounded) {
       player.velocityY = player.jumpPower;
       player.isGrounded = false;
-      
-      // Play Candidate Jump Audio
       if (jumpAudio) {
         jumpAudio.currentTime = 0;
         jumpAudio.play().catch(() => { playSynthBeep(587, 'square', 0.1); });
@@ -435,12 +417,10 @@
   function gameOver() {
     isGameOver = true;
     
-    // Switch to Candidate Death Image
     if (selectedCandidate) {
       playerImg.src = selectedCandidate.img2;
     }
 
-    // Play Candidate Death Audio
     if (dieAudio) {
       dieAudio.currentTime = 0;
       dieAudio.play().catch(() => { playSynthBeep(150, 'sawtooth', 0.3); });
@@ -448,7 +428,6 @@
       playSynthBeep(150, 'sawtooth', 0.3);
     }
 
-    // Update High Score
     if (score > highScore) {
       highScore = Math.floor(score);
       localStorage.setItem('dino_highscore', highScore);
@@ -471,7 +450,7 @@
     player.isGrounded = true;
 
     if (selectedCandidate) {
-      playerImg.src = selectedCandidate.img1;
+      playerImg.src = selectedCandidate.baseImg + '1.png';
     }
 
     document.getElementById('game-over-overlay').classList.remove('active');
@@ -482,10 +461,10 @@
 
   function restartGame(e) {
     if(e) e.stopPropagation();
+    obstacles = [];
     initGame();
   }
 
-  // Main Game Loop
   function gameLoop() {
     if (!gameActive) return;
 
@@ -496,7 +475,6 @@
       score += 0.15;
       gameSpeed += 0.0008;
 
-      // Update Player Physics
       player.velocityY += player.gravity;
       player.y += player.velocityY;
 
@@ -506,7 +484,6 @@
         player.isGrounded = true;
       }
 
-      // Spawn obstacles periodically
       if (frameCount % Math.max(60, Math.floor(1200 / gameSpeed)) === 0) {
         if (Math.random() > 0.3) {
           spawnObstacle();
@@ -535,7 +512,6 @@
         drawCactus(ctx, obs.x, obs.y, obs.width, obs.height, obs.type);
       }
 
-      // Precise Box Collision Detection
       const padding = 6;
       if (
         player.x + padding < obs.x + obs.width &&
@@ -551,35 +527,30 @@
       }
     }
 
-    // Render Player Character Face inside clear circular cutout badge
+    // Render Player Character Face inside circular cutout with CLASSIC BLACK border (#535353)
     ctx.save();
     ctx.beginPath();
     ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width/2, 0, Math.PI * 2);
     ctx.closePath();
     ctx.clip();
     
-    // Draw white background behind facial cutout
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(player.x, player.y, player.width, player.height);
     
-    // Draw character image
     ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
     ctx.restore();
 
-    // Draw circular border ring around character face
-    ctx.strokeStyle = selectedCandidate ? selectedCandidate.color : '#1a73e8';
+    ctx.strokeStyle = '#535353';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width/2 - 1.5, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Update Score Display
     document.getElementById('score-text').innerText = String(Math.floor(score)).padStart(5, '0');
 
     animationFrameId = requestAnimationFrame(gameLoop);
   }
 
-  // Global Touch & Click to Jump setup (touch/click anywhere except buttons)
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.code === 'ArrowUp') {
       e.preventDefault();
@@ -589,11 +560,9 @@
 
   const gameScreen = document.getElementById('screen-game');
   gameScreen.addEventListener('pointerdown', (e) => {
-    // Avoid triggering jump when clicking on buttons or overlays
     if (e.target.tagName === 'BUTTON' || e.target.closest('#game-over-overlay')) return;
     triggerJump();
   });
 </script>
 </body>
-    </html>
-    
+</html>
