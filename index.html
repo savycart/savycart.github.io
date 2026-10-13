@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Dino Runner2</title>
+  <title>Dino Runner3</title>
   <style>
     * {
       box-sizing: border-box;
@@ -384,7 +384,10 @@
   }
 
   function gameOver() {
+    if (isGameOver) return;
     isGameOver = true;
+    gameActive = false; // Stop game loop updates immediately
+    cancelAnimationFrame(animationFrameId);
     
     if (selectedCandidate) {
       playerImg.src = selectedCandidate.img2;
@@ -405,7 +408,8 @@
   }
 
   function initGame() {
-    obstacles = []; // Completely wipe out obstacles immediately so player never restarts stuck
+    cancelAnimationFrame(animationFrameId);
+    obstacles = []; // Wipe out all obstacles so player never restarts stuck
     gameActive = true;
     isGameOver = false;
     score = 0;
@@ -421,8 +425,6 @@
     }
 
     document.getElementById('game-over-overlay').classList.remove('active');
-    
-    cancelAnimationFrame(animationFrameId);
     gameLoop();
   }
 
