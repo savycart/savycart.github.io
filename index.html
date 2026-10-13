@@ -264,7 +264,6 @@
     const img = document.createElement('img');
     img.className = 'avatar-cutout';
     
-    // Try loading .png first, then .jpg, then .jpeg
     let attempt = 1;
     img.src = cand.baseImg + '1.png';
     
@@ -279,7 +278,6 @@
         attempt = 4;
         this.src = cand.baseImg + '1.jpeg';
       } else {
-        // If no image is found in repository, display initial letter avatar
         this.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(
           `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
             <circle cx="40" cy="40" r="40" fill="${cand.color}"/>
@@ -443,7 +441,7 @@
     score = 0;
     gameSpeed = 6;
     frameCount = 0;
-    obstacles = [];
+    obstacles = []; // Completely clear any active obstacles on start/restart
     
     player.y = player.groundY;
     player.velocityY = 0;
@@ -461,7 +459,6 @@
 
   function restartGame(e) {
     if(e) e.stopPropagation();
-    obstacles = [];
     initGame();
   }
 
@@ -540,6 +537,7 @@
     ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
     ctx.restore();
 
+    // Classic black border ring (#535353) around character face
     ctx.strokeStyle = '#535353';
     ctx.lineWidth = 3;
     ctx.beginPath();
